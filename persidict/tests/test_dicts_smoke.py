@@ -11,22 +11,16 @@ def validate_dict_object(dict_to_test):
     a_key = dict_to_test._add_all_suffixes_if_absent(["Blah-Blah-Blah"])
     assert a_key == dict_to_test._add_all_suffixes_if_absent(a_key)
 
-    assert len(dict_to_test) == 0
-    dict_to_test["aaAA"] = "aaAA_1"
-    model_dict["aaAA"] = "aaAA_1"
-    assert len(dict_to_test) == len(model_dict)
+    assert len(dict_to_test) == len(model_dict) == 0
 
-    dict_to_test["AAaa"] = "AAaa_2"
-    model_dict["AAaa"] = "AAaa_2"
-    assert len(dict_to_test) == len(model_dict)
-
-    dict_to_test["AAAA"] = "AAAA_3"
-    model_dict["AAAA"] = "AAAA_3"
-    assert len(dict_to_test) == len(model_dict)
+    for s in ["aaAA", "AAaa", "AAAA", "aaaa", "aAaA", "aAaa"]:
+        dict_to_test[s] = s + s
+        model_dict[s] = s + s
+        assert len(dict_to_test) == len(model_dict)
 
     dict_to_test.clear()
     model_dict.clear()
-    assert len(dict_to_test) == len(model_dict)
+    assert len(dict_to_test) == len(model_dict) == 0
 
     for i in range(10):
         k = ("_"+str(10*i),)
@@ -118,3 +112,5 @@ def test_FileDirDict(tmpdir):
 #
 #     d_p = S3_Dict(bucket_name="TEST", file_type="pkl",dir_name = tmpdir)
 #     validate_dict_object(d_p)
+
+

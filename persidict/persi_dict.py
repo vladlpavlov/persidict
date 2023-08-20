@@ -185,6 +185,20 @@ class PersiDict(MutableMapping):
 
         return new_key
 
+    def __repr__(self):
+        """Return repr(self)"""
+        repr_str = self.__class__.__name__ + "("
+        repr_str += repr(dict(self.items()))
+        repr_str += f", immutable_items={self.immutable_items}"
+        repr_str += f", digest_len={self.digest_len}"
+        repr_str += ")"
+        return repr_str
+
+
+    def __str__(self):
+        """Return str(self)"""
+        return str(dict(self.items()))
+
 
     @abstractmethod
     def __contains__(self, key:PersiDictKey) -> bool:

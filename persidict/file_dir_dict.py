@@ -1,7 +1,7 @@
-""" Persistent dictionaries that store key-value pairs on local disks=.
+""" Persistent dictionaries that store key-value pairs on local disks.
 
 This functionality is implemented by the class FileDirDict
-(inherited from PersiDict) : a dictionary that
+(inherited from PersiDict): a dictionary that
 stores key-value pairs as files on a local hard-drive.
 A key is used to compose a filename, while a value is stored
 as a pickle or a json object in the file.
@@ -61,6 +61,17 @@ class FileDirDict(PersiDict):
         assert os.path.isdir(dir_name)
 
         self.base_dir = os.path.abspath(dir_name)
+
+    def __repr__(self):
+        """Return repr(self)."""
+
+        repr_str = super().__repr__()
+        repr_str = repr_str[:-1] + f", dir_name={self.base_dir}"
+        repr_str += f", file_type={self.file_type}"
+        repr_str += " )"
+
+        return repr_str
+
 
     def __len__(self) -> int:
         """ Get number of key-value pairs in the dictionary."""
