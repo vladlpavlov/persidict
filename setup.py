@@ -8,7 +8,7 @@ setuptools.setup(
     ,version="0.0.1"
     ,author="Vlad (Volodymyr) Pavlov"
     ,author_email="vlpavlov@ieee.org"
-    ,description= "Simpe persistent dictionaries for Python. " 
+    ,description= "Simple persistent key-value store for Python. " 
         "Values are stored as files on a disk or as S3 objects."
     ,long_description=long_description
     ,long_description_content_type="text/markdown"
