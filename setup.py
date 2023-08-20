@@ -5,11 +5,11 @@ with open("README.md", "r") as f:
 
 setuptools.setup(
     name="persidict"
-    ,version="0.0.1"
+    ,version="0.0.2"
     ,author="Vlad (Volodymyr) Pavlov"
     ,author_email="vlpavlov@ieee.org"
     ,description= "Simple persistent key-value store for Python. " 
-        "Values are stored as files on a disk or as S3 objects."
+        "Values are stored as files on a disk or as S3 objects on AWS cloud."
     ,long_description=long_description
     ,long_description_content_type="text/markdown"
     ,url="https://github.com/vladlpavlov/persidict"
