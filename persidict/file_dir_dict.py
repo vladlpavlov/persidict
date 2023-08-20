@@ -94,7 +94,7 @@ class FileDirDict(PersiDict):
                          , is_file_path:bool=True) -> str:
         """Convert a key into a filesystem path."""
 
-        key = self._normalize_key(key)
+        key = self._add_all_suffixes_if_absent(key)
         key = [self.base_dir] + list(key)
         dir_names = key[:-1] if is_file_path else key
 

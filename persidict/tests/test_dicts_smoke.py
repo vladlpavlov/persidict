@@ -28,7 +28,6 @@ def validate_dict_object(dict_to_test):
     model_dict.clear()
     assert len(dict_to_test) == len(model_dict)
 
-
     for i in range(10):
         k = ("_"+str(10*i),)
         dict_to_test[k] = i
