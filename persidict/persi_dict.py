@@ -12,7 +12,7 @@ from __future__ import annotations
 import base64
 import hashlib
 from abc import *
-from typing import Any, Tuple, Union, Sequence
+from typing import Any, Tuple, Union, Sequence, Dict
 import string
 
 from collections.abc import MutableMapping
@@ -321,9 +321,18 @@ class PersiDict(MutableMapping):
             pass
 
 
-    def subdicts(self, prefix_key:PersiDictKey) -> PersiDict:
+    def get_subdict(self, prefix_key:PersiDictKey) -> PersiDict:
         """Get a subdictionary containing items with the same prefix_key.
 
         This method is absent in the original dict API.
         """
         raise NotImplementedError
+
+    def subdicts(self) -> Dict[str, PersiDict]:
+        """Get a dictionary of subdictionaries.
+
+        This method is absent in the original dict API.
+        """
+        all_keys = {k[0] for k in self.keys()}
+        result_subdicts = {k: self.get_subdict(k) for k in all_keys}
+        return result_subdicts

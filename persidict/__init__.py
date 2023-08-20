@@ -3,7 +3,7 @@
 The module offers 3 main classes:
 
 PersiDict: base class in the hierarchy, defines unified interface
-of all persistent dictionaries.
+for all persistent dictionaries.
 
 FileDirDict (inherited from PersiDict) : a dictionary that
 stores key-value pairs as files on a local hard-drive.

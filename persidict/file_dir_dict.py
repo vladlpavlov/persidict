@@ -85,7 +85,7 @@ class FileDirDict(PersiDict):
         return num_files
 
     def clear(self):
-        """ Remove all elements form the dictionary."""
+        """ Remove all elements from the dictionary."""
 
         assert not self.immutable_items, (
             "Can't clear a dict that contains immutable items")

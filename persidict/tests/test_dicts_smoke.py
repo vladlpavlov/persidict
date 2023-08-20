@@ -113,4 +113,12 @@ def test_FileDirDict(tmpdir):
 #     d_p = S3_Dict(bucket_name="TEST", file_type="pkl",dir_name = tmpdir)
 #     validate_dict_object(d_p)
 
+def test_demo(tmpdir):
+    print("\n")
+    p = FileDirDict(dir_name=tmpdir, file_type="pkl")
+    p["a","bb"] = 1
+    p["a", "bbbbbb"] = 2
+    p["y", "bb"] = 100
+    print(p.subdicts())
+
 
