@@ -4,7 +4,75 @@ from persidict import FileDirDict
 import pandas as pd
 # from moto import mock_s3
 
+
+def validate_basics(dict_to_test):
+    dict_to_test.clear()
+    model_dict = dict()
+    assert len(dict_to_test) == len(model_dict) == 0
+
+    all_keys = [("test",f"key_{i}","Q") for i in range(10)]
+
+    for i,k in enumerate(all_keys):
+        dict_to_test[k] = i
+        dict_to_test[k] = i
+        model_dict[k] = i
+        assert len(dict_to_test) == len(model_dict)
+        dict_to_test[k] = i+1
+        model_dict[k] = i+1
+        assert dict_to_test[k] == model_dict[k]
+
+    for i,k in enumerate(all_keys):
+        fake_k = f"fake_key_{i}"
+        assert k in dict_to_test
+        assert fake_k not in dict_to_test
+        del dict_to_test[k]
+        del model_dict[k]
+        assert len(dict_to_test) == len(model_dict)
+        assert k not in dict_to_test
+
+    dict_to_test.clear()
+
+
+def validate_iterators(dict_to_test):
+    dict_to_test.clear()
+    model_dict = dict()
+    assert len(dict_to_test) == len(model_dict) == 0
+
+    for i in range(25):
+        k = f"key_{i*i}"
+        dict_to_test[k] = 2*i
+        model_dict[k] = 2*i
+
+    assert (len(model_dict)
+            == len(list(dict_to_test.keys()))
+            == len(list(dict_to_test.values()))
+            == len(list(dict_to_test.items())))
+
+    assert sorted([str(k[0]) for k in dict_to_test.keys()]) == sorted(
+        [str(k) for k in model_dict.keys()]) ##?!?!?!?!?!?!?
+    assert sorted([str(v) for v in dict_to_test.values()]) == sorted(
+        [str(v) for v in model_dict.values()])
+
+    dict_to_test.clear()
+
+
+def validate_case_sensitivity(dict_to_test):
+    dict_to_test.clear()
+    model_dict = dict()
+
+    for s in ["aaAA", "AAaa", "AAAA", "aaaa", "aAaA", "aAaa"]:
+        dict_to_test[s] = s + s
+        model_dict[s] = s + s
+        assert len(dict_to_test) == len(model_dict)
+        assert dict_to_test[s] == model_dict[s]
+
+    dict_to_test.clear()
+
+
 def validate_dict_object(dict_to_test):
+    validate_basics(dict_to_test)
+    validate_case_sensitivity(dict_to_test)
+    validate_iterators(dict_to_test)
     dict_to_test.clear()
     model_dict = dict()
 
@@ -13,22 +81,9 @@ def validate_dict_object(dict_to_test):
 
     assert len(dict_to_test) == len(model_dict) == 0
 
-    for s in ["aaAA", "AAaa", "AAAA", "aaaa", "aAaA", "aAaa"]:
-        dict_to_test[s] = s + s
-        model_dict[s] = s + s
-        assert len(dict_to_test) == len(model_dict)
-
-    dict_to_test.clear()
-    model_dict.clear()
-    assert len(dict_to_test) == len(model_dict) == 0
-
     for i in range(10):
         k = ("_"+str(10*i),)
-        dict_to_test[k] = i
-        dict_to_test[k] = i
         dict_to_test[k] = i + 1
-        dict_to_test[k] = i + 1
-        model_dict[k] = i
         model_dict[k] = i + 1
 
         k = (i + 1) * (str(i) + "zz",)
@@ -55,14 +110,6 @@ def validate_dict_object(dict_to_test):
     assert dict_to_test == model_dict
     for v in model_dict:
         assert v in dict_to_test
-
-    assert (len(dict_to_test)
-            == len(list(dict_to_test.keys()))
-            == len(list(dict_to_test.values()))
-            == len(list(dict_to_test.items())))
-
-    assert sorted([str(k) for k in dict_to_test.keys()]) == sorted([str(k) for k in model_dict.keys()])
-    assert sorted([str(v) for v in dict_to_test.values()]) == sorted([str(v) for v in model_dict.values()])
 
 
     for j in range(len(dict_to_test)):
