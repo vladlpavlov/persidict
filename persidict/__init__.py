@@ -17,3 +17,4 @@ as a pickle or a json S3 object.
 """
 
 from .persi_dict import PersiDict, PersiDictKey
+from .file_dir_dict import FileDirDict

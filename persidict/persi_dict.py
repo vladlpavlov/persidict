@@ -1,47 +1,63 @@
-""" Persistent dictionaries that store key-value pairs on local disks or AWS S3.
+"""Core datatypes used in persistent dictionaries' hierarchy.
 
-The module offers 3 main classes:
+The module offers 2 types: PersiDict and PersiDictKey.
 
-PersiDict: base class in the hierarchy, defines unified interface
+PersiDict: a base class in the hierarchy, defines unified interface
 of all persistent dictionaries.
 
-FileDirDict (inherited from PersiDict) : a dictionary that
-stores key-value pairs as files on a local hard-drive.
-A key is used to compose a filename, while a value is stored
-as a pickle or a json object in the file.
-
-S3_Dict (inherited from PersiDict): a dictionary that
-stores key-value pairs on AWS S3.
-A key is used to compose an objectname, while a value is stored
-as a pickle or a json S3 object.
+PersiDictKey: a value which can be used as a key for PersiDict.
 """
 from __future__ import annotations
 
 import base64
 import hashlib
-import os
-import pickle
 from abc import *
 from typing import Any, Tuple, Union, Sequence
 import string
 
-import jsonpickle
-import jsonpickle.ext.numpy as jsonpickle_numpy
-import jsonpickle.ext.pandas as jsonpickle_pandas
-
 from collections.abc import MutableMapping
 
-jsonpickle_numpy.register_handlers()
-jsonpickle_pandas.register_handlers()
+SAFE_CHARS_SET = set(string.ascii_letters + string.digits + "()_-~.=")
 
-PersiDictKey = Union[ str, Sequence[str]]
+PersiDictKey = Union[str, Sequence[str]]
 """ A value which can be used as a key for PersiDict. 
 
 PersiDictKey must be a string or a sequence of strings.
-The characters within strings are restricted to SAFE_CHARS set.
+The characters within strings are restricted to SAFE_CHARS_SET.
 """
 
-SAFE_CHARS = set(string.ascii_letters + string.digits + "()_-~.=")
+def persi_dict_key(key:PersiDictKey) -> PersiDictKey:
+    """Check if a key meets requirements and return its standardized form.
+
+    A key must be either a string or a sequence of non-empty strings.
+    If it is a single string, it will be transformed into a tuple,
+    consisting of this sole string.
+
+    Each string in an input  sequence can contain
+    only URL-safe characters (alphanumerical characters
+    plus a few special characters)
+    """
+
+    try:
+        iter(key)
+    except:
+        raise KeyError(f"A key must be a string or a sequence of strings.")
+    if isinstance(key, str):
+        key = (key,)
+
+    for s in key:
+        if not isinstance(s,str):
+            raise KeyError(f"A key must be a string or a sequence of strings.")
+        elif not len(s):
+            raise KeyError("Only non-empty strings are allowed in a key")
+        elif len(set(s) - SAFE_CHARS_SET):
+            raise KeyError(
+                f"Invalid characters in the key: {(set(s) - SAFE_CHARS_SET)}"
+                + "\nOnly the following chars are allowed in a key:"
+                + "".join(list(SAFE_CHARS_SET)))
+
+    return key
+
 
 class PersiDict(MutableMapping):
     """Dict-like durable store that accepts sequences of strings as keys.
@@ -65,7 +81,7 @@ class PersiDict(MutableMapping):
                       for remote storage.
                       False means normal dict-like behaviour.
 
-    min_digest_len : int
+    digest_len : int
                  Length of a hash signature suffix which SimplePersistentDict
                  automatically adds to each string in a key
                  while mapping the key to an address of a value
@@ -76,15 +92,15 @@ class PersiDict(MutableMapping):
 
     """
     # TODO: refactor to support variable length of min_digest_len
-    min_digest_len:int
+    digest_len:int
     immutable_items:bool
 
     def __init__(self
                  , immutable_items:bool
-                 , min_digest_len:int = 8
+                 , digest_len:int = 8
                  , **kwargas):
-        assert min_digest_len >= 0
-        self.min_digest_len = min_digest_len
+        assert digest_len >= 0
+        self.digest_len = digest_len
         self.immutable_items = bool(immutable_items)
 
 
@@ -93,13 +109,13 @@ class PersiDict(MutableMapping):
 
         assert isinstance(input_str, str)
 
-        if self.min_digest_len == 0:
+        if self.digest_len == 0:
             return ""
 
         input_b = input_str.encode()
         hash_object = hashlib.md5(input_b)
         full_digest_str = base64.b32encode(hash_object.digest()).decode()
-        suffix = "_" + full_digest_str[:self.min_digest_len]
+        suffix = "_" + full_digest_str[:self.digest_len]
 
         return suffix
 
@@ -109,12 +125,12 @@ class PersiDict(MutableMapping):
 
         assert isinstance(input_str, str)
 
-        if self.min_digest_len == 0:
+        if self.digest_len == 0:
             return input_str
 
-        if len(input_str) > self.min_digest_len + 1:
+        if len(input_str) > self.digest_len + 1:
             possibly_already_present_suffix = self._create_suffix(
-                input_str[:-1-self.min_digest_len])
+                input_str[:-1-self.digest_len])
             if input_str.endswith(possibly_already_present_suffix):
                 return input_str
 
@@ -126,26 +142,25 @@ class PersiDict(MutableMapping):
 
         assert isinstance(input_str, str)
 
-        if self.min_digest_len == 0:
+        if self.digest_len == 0:
             return input_str
 
-        if len(input_str) > self.min_digest_len + 1:
+        if len(input_str) > self.digest_len + 1:
             possibly_already_present_suffix = self._create_suffix(
-                input_str[:-1-self.min_digest_len])
+                input_str[:-1-self.digest_len])
             if input_str.endswith(possibly_already_present_suffix):
-                return input_str[:-1-self.min_digest_len]
+                return input_str[:-1-self.digest_len]
 
         return input_str
 
 
     def _remove_all_suffixes_if_present(self, key:PersiDictKey) -> PersiDictKey:
-        """ Remove hash signature suffixes from all strings in a key."""
+        """Remove hash signature suffixes from all strings in a key."""
 
-        if self.min_digest_len == 0:
+        key = persi_dict_key(key)
+
+        if self.digest_len == 0:
             return key
-
-        if isinstance(key, str):
-            key = (key,)
 
         new_key = []
         for sub_key in key:
@@ -157,33 +172,10 @@ class PersiDict(MutableMapping):
         return new_key
 
 
-    def _normalize_key(self, key:PersiDictKey) -> Tuple[str,...]:
-        """Check if a key meets requirements and return its standardized form.
+    def _add_all_suffixes_if_absent(self, key:PersiDictKey) -> PersiDictKey:
+        """Add hash signature suffixes to all strings in a key."""
 
-        A key must be either a string or a sequence of non-empty strings.
-        If it is a single string, it will be transformed into a tuple,
-        consisting of this sole string. During the transformation,
-        each string will also get a hash-based suffix (a signature).
-
-        Each string in an input  sequence can contain
-        only URL-safe characters (alphanumerical characters
-        and characters from this list: ()_-.=)
-        """
-
-        try:
-            iter(key)
-        except:
-            raise KeyError(f"Key must be a string or a sequence of strings.")
-        if isinstance(key, str):
-            key = (key,)
-        for s in key:
-            assert isinstance(s,str), (
-                    "Key must be a string or a sequence of strings.")
-            assert len(set(s) - SAFE_CHARS) == 0, (
-                f"Invalid characters in the key: {(set(s) - SAFE_CHARS)}"
-                + "\nOnly the following chars are allowed in a key:"
-                + "".join(list(SAFE_CHARS)))
-            assert len(s), "Only non-empty strings are allowed in a key"
+        key = persi_dict_key(key)
 
         new_key = []
         for s in key:
@@ -299,7 +291,7 @@ class PersiDict(MutableMapping):
             del self[k]
 
 
-    def safe_delete(self, key:PersiDictKey):
+    def quiet_delete(self, key:PersiDictKey):
         """ Delete an item without raising an exception if it doesn't exist.
 
         This method is absent in the original dict API, it is added here
@@ -315,7 +307,7 @@ class PersiDict(MutableMapping):
             pass
 
 
-    def get_subdict(self, prefix_key:PersiDictKey) -> PersiDict:
+    def subdicts(self, prefix_key:PersiDictKey) -> PersiDict:
         """Get a subdictionary containing items with the same prefix_key.
 
         This method is absent in the original dict API.
