@@ -1,3 +1,5 @@
+import base64
+import hashlib
 import string
 from collections.abc import Sequence
 from typing import Tuple
@@ -55,3 +57,113 @@ class SafeStrSequence(Sequence):
 
     def __reversed__(self):
         return SafeStrSequence(*reversed(self.safe_strings))
+
+
+
+def _create_signature_suffix(input_str:str, digest_len:int) -> str:
+    """ Create a hash signature suffix for a string."""
+
+    assert isinstance(input_str, str)
+
+    if digest_len == 0:
+        return ""
+
+    input_b = input_str.encode()
+    hash_object = hashlib.md5(input_b)
+    full_digest_str = base64.b32encode(hash_object.digest()).decode()
+    suffix = "_" + full_digest_str[:digest_len]
+
+    return suffix
+
+
+def _add_signature_suffix_if_absent(input_str:str, digest_len:int) -> str:
+    """ Add a hash signature suffix to a string if it's not there."""
+
+    assert isinstance(input_str, str)
+
+    if digest_len == 0:
+        return input_str
+
+    if len(input_str) > digest_len + 1:
+        possibly_already_present_suffix = _create_signature_suffix(
+            input_str[:-1-digest_len], digest_len)
+        if input_str.endswith(possibly_already_present_suffix):
+            return input_str
+
+    return input_str + _create_signature_suffix(input_str, digest_len)
+
+
+def _add_all_suffixes_if_absent(
+        str_seq:SafeStrSequence
+        ,digest_len:int
+        ) -> SafeStrSequence:
+    """Add hash signature suffixes to all strings in a SafeStrSequence."""
+
+    str_seq = SafeStrSequence(str_seq)
+
+    new_seq = []
+    for s in str_seq:
+        new_seq.append(_add_signature_suffix_if_absent(s,digest_len))
+
+    new_seq = SafeStrSequence(*new_seq)
+
+    return new_seq
+
+def _remove_signature_suffix_if_present(input_str:str, digest_len:int) -> str:
+    """ Remove a hash signature suffix from a string if it's detected."""
+
+    assert isinstance(input_str, str)
+
+    if digest_len == 0:
+        return input_str
+
+    if len(input_str) > digest_len + 1:
+        possibly_already_present_suffix = _create_signature_suffix(
+            input_str[:-1-digest_len], digest_len)
+        if input_str.endswith(possibly_already_present_suffix):
+            return input_str[:-1-digest_len]
+
+    return input_str
+
+def _remove_all_signature_suffixes_if_present(
+        str_seq:SafeStrSequence
+        , digest_len:int
+        ) -> SafeStrSequence:
+    """Remove hash signature suffixes from all strings in a SafeStrSequence."""
+
+    str_seq = SafeStrSequence(str_seq)
+
+    if digest_len == 0:
+        return str_seq
+
+    new_seq = []
+    for s in str_seq:
+        new_string = _remove_signature_suffix_if_present(s, digest_len)
+        new_seq.append(new_string)
+
+    new_seq = SafeStrSequence(*new_seq)
+
+    return new_seq
+
+def sign_safe_sting_sequence(str_seq:SafeStrSequence
+        , digest_len:int
+        ) -> SafeStrSequence:
+    """Add hash signature suffixes to all strings in a SafeStrSequence."""
+
+    str_seq = SafeStrSequence(str_seq)
+
+    str_seq = _add_all_suffixes_if_absent(str_seq, digest_len)
+
+    return str_seq
+
+def unsign_safe_sting_sequence(str_seq:SafeStrSequence
+        , digest_len:int
+        ) -> SafeStrSequence:
+    """Remove hash signature suffixes from all strings in a SafeStrSequence."""
+
+    str_seq = SafeStrSequence(str_seq)
+
+    str_seq = _remove_all_signature_suffixes_if_present(str_seq, digest_len)
+
+    return str_seq
+

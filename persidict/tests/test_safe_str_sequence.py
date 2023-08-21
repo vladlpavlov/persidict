@@ -1,4 +1,7 @@
-from persidict import SafeStrSequence
+import base64
+import hashlib
+
+from persidict import SafeStrSequence, sign_safe_sting_sequence, unsign_safe_sting_sequence
 
 def test_add():
     l1 = ['a', 'b', 'c']
@@ -66,3 +69,13 @@ def test_init():
     assert s != SafeStrSequence(*l, 'd')
     assert s != SafeStrSequence(*l, 'd', 'e')
     assert s != SafeStrSequence(*l, 'd', 'e', 'f')
+
+def test_signing_unsigning():
+    l = ['a', 'b', 'c']
+    for n in range(4,20):
+        s = SafeStrSequence(*l)
+        signed_s = sign_safe_sting_sequence(s,n)
+        assert s == unsign_safe_sting_sequence(signed_s,n)
+        assert s != signed_s
+        assert signed_s == sign_safe_sting_sequence(signed_s,n)
+        assert s == unsign_safe_sting_sequence(s,n)
