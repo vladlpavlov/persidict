@@ -2,10 +2,21 @@ import base64
 import hashlib
 import string
 from collections.abc import Sequence
-from typing import Tuple
+from typing import Tuple, Any
 
 SAFE_CHARS_SET = set(string.ascii_letters + string.digits + "()_-~.=")
 
+def _is_sequence(obj:Any)->bool:
+    """Check if obj is a sequence."""
+    if isinstance(obj, Sequence):
+        return True
+    else:
+        try:
+            if callable(obj.__getitem__) and callable(obj.__len__):
+                return True
+        except:
+            pass
+    return False
 
 class SafeStrSequence(Sequence):
     """A sequence of non-emtpy URL/filename-safe strings.
@@ -14,16 +25,19 @@ class SafeStrSequence(Sequence):
     safe_strings: Tuple[str, ...]
 
     def __init__(self, *args):
-        if len(args) == 1 and isinstance(args[0], SafeStrSequence):
-            self.safe_strings = args[0].safe_strings
-        else:
-            candidate = []
-            for a in args:
-                assert isinstance(a, str)
+        candidate = []
+        for a in args:
+            if isinstance(a, SafeStrSequence):
+                candidate.extend(a.safe_strings)
+            elif isinstance(a, str):
                 assert len(a) > 0
                 assert len(set(a) - SAFE_CHARS_SET) == 0
                 candidate.append(a)
-            self.safe_strings = tuple(candidate)
+            elif _is_sequence(a):
+                candidate.extend(SafeStrSequence(*a).safe_strings)
+            else:
+                assert False, f"Invalid argument type: {type(a)}"
+        self.safe_strings = tuple(candidate)
 
     def __getitem__(self, key):
         return self.safe_strings[key]
@@ -145,7 +159,7 @@ def _remove_all_signature_suffixes_if_present(
 
     return new_seq
 
-def sign_safe_sting_sequence(str_seq:SafeStrSequence
+def sign_safe_string_sequence(str_seq:SafeStrSequence
         , digest_len:int
         ) -> SafeStrSequence:
     """Add hash signature suffixes to all strings in a SafeStrSequence."""
@@ -156,7 +170,7 @@ def sign_safe_sting_sequence(str_seq:SafeStrSequence
 
     return str_seq
 
-def unsign_safe_sting_sequence(str_seq:SafeStrSequence
+def unsign_safe_string_sequence(str_seq:SafeStrSequence
         , digest_len:int
         ) -> SafeStrSequence:
     """Remove hash signature suffixes from all strings in a SafeStrSequence."""

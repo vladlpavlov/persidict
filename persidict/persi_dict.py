@@ -9,61 +9,50 @@ PersiDictKey: a value which can be used as a key for PersiDict.
 """
 from __future__ import annotations
 
-import base64
-import hashlib
-from abc import *
+from abc import abstractmethod
 from typing import Any, Tuple, Union, Sequence, Dict
-import string
-
 from collections.abc import MutableMapping
 
-SAFE_CHARS_SET = set(string.ascii_letters + string.digits + "()_-~.=")
+from .safe_str_sequence import SafeStrSequence, sign_safe_string_sequence, unsign_safe_string_sequence
 
-PersiDictKey = Union[str, Sequence[str]]
-""" A value which can be used as a key for PersiDict. 
-
-PersiDictKey must be a string or a sequence of strings.
-The characters within strings are restricted to SAFE_CHARS_SET.
-"""
-
-def persi_dict_key(key:PersiDictKey) -> PersiDictKey:
-    """Check if a key meets requirements and return its standardized form.
-
-    A key must be either a string or a sequence of non-empty strings.
-    If it is a single string, it will be transformed into a tuple,
-    consisting of this sole string.
-
-    Each string in an input  sequence can contain
-    only URL-safe characters (alphanumerical characters
-    plus a few special characters)
-    """
-
-    try:
-        iter(key)
-    except:
-        raise KeyError(f"A key must be a string or a sequence of strings.")
-    if isinstance(key, str):
-        key = (key,)
-
-    for s in key:
-        if not isinstance(s,str):
-            raise KeyError(f"A key must be a string or a sequence of strings.")
-        elif not len(s):
-            raise KeyError("Only non-empty strings are allowed in a key")
-        elif len(set(s) - SAFE_CHARS_SET):
-            raise KeyError(
-                f"Invalid characters in the key: {(set(s) - SAFE_CHARS_SET)}"
-                + "\nOnly the following chars are allowed in a key:"
-                + "".join(list(SAFE_CHARS_SET)))
-
-    return key
+# def persi_dict_key(key:PersiDictKey) -> PersiDictKey:
+#     """Check if a key meets requirements and return its standardized form.
+#
+#     A key must be either a string or a sequence of non-empty strings.
+#     If it is a single string, it will be transformed into a tuple,
+#     consisting of this sole string.
+#
+#     Each string in an input  sequence can contain
+#     only URL-safe characters (alphanumerical characters
+#     plus a few special characters)
+#     """
+#
+#     try:
+#         iter(key)
+#     except:
+#         raise KeyError(f"A key must be a string or a sequence of strings.")
+#     if isinstance(key, str):
+#         key = (key,)
+#
+#     for s in key:
+#         if not isinstance(s,str):
+#             raise KeyError(f"A key must be a string or a sequence of strings.")
+#         elif not len(s):
+#             raise KeyError("Only non-empty strings are allowed in a key")
+#         elif len(set(s) - SAFE_CHARS_SET):
+#             raise KeyError(
+#                 f"Invalid characters in the key: {(set(s) - SAFE_CHARS_SET)}"
+#                 + "\nOnly the following chars are allowed in a key:"
+#                 + "".join(list(SAFE_CHARS_SET)))
+#
+#     return key
 
 
 class PersiDict(MutableMapping):
-    """Dict-like durable store that accepts sequences of strings as keys.
+    """Dict-like durable store that accepts sequences of strings keys.
 
     An abstract base class for key-value stores. It accepts keys in a form of
-    either a single sting or a sequence (tuple, list, etc.) of strings.
+    SafeStrSequence - a URL/filename-safe sequence of strings.
     It imposes no restrictions on types of values in the key-value pairs.
 
     The API for the class resembles the API of Python's built-in Dict
@@ -100,90 +89,90 @@ class PersiDict(MutableMapping):
                  , digest_len:int = 8
                  , **kwargas):
         assert digest_len >= 0
-        self.digest_len = digest_len
+        self.digest_len = int(digest_len)
         self.immutable_items = bool(immutable_items)
 
 
-    def _create_suffix(self, input_str:str) -> str:
-        """ Create a hash signature suffix for a string."""
-
-        assert isinstance(input_str, str)
-
-        if self.digest_len == 0:
-            return ""
-
-        input_b = input_str.encode()
-        hash_object = hashlib.md5(input_b)
-        full_digest_str = base64.b32encode(hash_object.digest()).decode()
-        suffix = "_" + full_digest_str[:self.digest_len]
-
-        return suffix
-
-
-    def _add_suffix_if_absent(self, input_str:str) -> str:
-        """ Add a hash signature suffix to a string if it's not there."""
-
-        assert isinstance(input_str, str)
-
-        if self.digest_len == 0:
-            return input_str
-
-        if len(input_str) > self.digest_len + 1:
-            possibly_already_present_suffix = self._create_suffix(
-                input_str[:-1-self.digest_len])
-            if input_str.endswith(possibly_already_present_suffix):
-                return input_str
-
-        return input_str + self._create_suffix(input_str)
-
-
-    def _remove_suffix_if_present(self, input_str:str) -> str:
-        """ Remove a hash signature suffix from a string if it's detected."""
-
-        assert isinstance(input_str, str)
-
-        if self.digest_len == 0:
-            return input_str
-
-        if len(input_str) > self.digest_len + 1:
-            possibly_already_present_suffix = self._create_suffix(
-                input_str[:-1-self.digest_len])
-            if input_str.endswith(possibly_already_present_suffix):
-                return input_str[:-1-self.digest_len]
-
-        return input_str
-
-
-    def _remove_all_suffixes_if_present(self, key:PersiDictKey) -> PersiDictKey:
-        """Remove hash signature suffixes from all strings in a key."""
-
-        key = persi_dict_key(key)
-
-        if self.digest_len == 0:
-            return key
-
-        new_key = []
-        for sub_key in key:
-            new_sub_key = self._remove_suffix_if_present(sub_key)
-            new_key.append(new_sub_key)
-
-        new_key = tuple(new_key)
-
-        return new_key
-
-
-    def _add_all_suffixes_if_absent(self, key:PersiDictKey) -> PersiDictKey:
-        """Add hash signature suffixes to all strings in a key."""
-
-        key = persi_dict_key(key)
-
-        new_key = []
-        for s in key:
-            new_key.append(self._add_suffix_if_absent(s))
-
-        new_key = tuple(new_key)
-
-        return new_key
+    # def _create_suffix(self, input_str:str) -> str:
+    #     """ Create a hash signature suffix for a string."""
+    #
+    #     assert isinstance(input_str, str)
+    #
+    #     if self.digest_len == 0:
+    #         return ""
+    #
+    #     input_b = input_str.encode()
+    #     hash_object = hashlib.md5(input_b)
+    #     full_digest_str = base64.b32encode(hash_object.digest()).decode()
+    #     suffix = "_" + full_digest_str[:self.digest_len]
+    #
+    #     return suffix
+    #
+    #
+    # def _add_suffix_if_absent(self, input_str:str) -> str:
+    #     """ Add a hash signature suffix to a string if it's not there."""
+    #
+    #     assert isinstance(input_str, str)
+    #
+    #     if self.digest_len == 0:
+    #         return input_str
+    #
+    #     if len(input_str) > self.digest_len + 1:
+    #         possibly_already_present_suffix = self._create_suffix(
+    #             input_str[:-1-self.digest_len])
+    #         if input_str.endswith(possibly_already_present_suffix):
+    #             return input_str
+    #
+    #     return input_str + self._create_suffix(input_str)
+    #
+    #
+    # def _remove_suffix_if_present(self, input_str:str) -> str:
+    #     """ Remove a hash signature suffix from a string if it's detected."""
+    #
+    #     assert isinstance(input_str, str)
+    #
+    #     if self.digest_len == 0:
+    #         return input_str
+    #
+    #     if len(input_str) > self.digest_len + 1:
+    #         possibly_already_present_suffix = self._create_suffix(
+    #             input_str[:-1-self.digest_len])
+    #         if input_str.endswith(possibly_already_present_suffix):
+    #             return input_str[:-1-self.digest_len]
+    #
+    #     return input_str
+    #
+    #
+    # def _remove_all_suffixes_if_present(self, key:PersiDictKey) -> PersiDictKey:
+    #     """Remove hash signature suffixes from all strings in a key."""
+    #
+    #     key = persi_dict_key(key)
+    #
+    #     if self.digest_len == 0:
+    #         return key
+    #
+    #     new_key = []
+    #     for sub_key in key:
+    #         new_sub_key = self._remove_suffix_if_present(sub_key)
+    #         new_key.append(new_sub_key)
+    #
+    #     new_key = tuple(new_key)
+    #
+    #     return new_key
+    #
+    #
+    # def _add_all_suffixes_if_absent(self, key:PersiDictKey) -> PersiDictKey:
+    #     """Add hash signature suffixes to all strings in a key."""
+    #
+    #     key = persi_dict_key(key)
+    #
+    #     new_key = []
+    #     for s in key:
+    #         new_key.append(self._add_suffix_if_absent(s))
+    #
+    #     new_key = tuple(new_key)
+    #
+    #     return new_key
 
     def __repr__(self):
         """Return repr(self)"""
@@ -201,25 +190,25 @@ class PersiDict(MutableMapping):
 
 
     @abstractmethod
-    def __contains__(self, key:PersiDictKey) -> bool:
+    def __contains__(self, key:SafeStrSequence) -> bool:
         """True if the dictionary has the specified key, else False."""
         raise NotImplementedError
 
 
     @abstractmethod
-    def __getitem__(self, key:PersiDictKey) -> Any:
+    def __getitem__(self, key:SafeStrSequence) -> Any:
         """X.__getitem__(y) is an equivalent to X[y]"""
         raise NotImplementedError
 
 
-    def __setitem__(self, key:PersiDictKey, value:Any):
+    def __setitem__(self, key:SafeStrSequence, value:Any):
         """Set self[key] to value."""
         if self.immutable_items: # TODO: change to exceptions
             assert key not in self, "Can't modify an immutable key-value pair"
         raise NotImplementedError
 
 
-    def __delitem__(self, key:PersiDictKey):
+    def __delitem__(self, key:SafeStrSequence):
         """Delete self[key]."""
         if self.immutable_items: # TODO: change to exceptions
             assert False, "Can't delete an immutable key-value pair"
@@ -259,7 +248,7 @@ class PersiDict(MutableMapping):
         return self._generic_iter("items")
 
 
-    def setdefault(self, key:PersiDictKey, default:Any=None) -> Any:
+    def setdefault(self, key:SafeStrSequence, default:Any=None) -> Any:
         """Insert key with a value of default if key is not in the dictionary.
 
         Return the value for key if key is in the dictionary, else default.
@@ -291,7 +280,7 @@ class PersiDict(MutableMapping):
 
 
     @abstractmethod
-    def mtimestamp(self,key:PersiDictKey) -> float:
+    def mtimestamp(self,key:SafeStrSequence) -> float:
         """Get last modification time (in seconds, Unix epoch time).
 
         This method is absent in the original dict API.
@@ -305,7 +294,7 @@ class PersiDict(MutableMapping):
             del self[k]
 
 
-    def quiet_delete(self, key:PersiDictKey):
+    def quiet_delete(self, key:SafeStrSequence):
         """ Delete an item without raising an exception if it doesn't exist.
 
         This method is absent in the original dict API, it is added here
@@ -321,7 +310,7 @@ class PersiDict(MutableMapping):
             pass
 
 
-    def get_subdict(self, prefix_key:PersiDictKey) -> PersiDict:
+    def get_subdict(self, prefix_key:SafeStrSequence) -> PersiDict:
         """Get a subdictionary containing items with the same prefix_key.
 
         This method is absent in the original dict API.

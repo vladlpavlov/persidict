@@ -76,9 +76,6 @@ def validate_dict_object(dict_to_test):
     dict_to_test.clear()
     model_dict = dict()
 
-    a_key = dict_to_test._add_all_suffixes_if_absent(["Blah-Blah-Blah"])
-    assert a_key == dict_to_test._add_all_suffixes_if_absent(a_key)
-
     assert len(dict_to_test) == len(model_dict) == 0
 
     for i in range(10):
