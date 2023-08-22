@@ -1,6 +1,18 @@
+"""Functions for signing and unsigning SafeStrTuples.
+
+Two functions from this module allow to add and remove
+hash signature suffixes to/from all strings in a SafeStrTuple:
+sign_safe_str_tuple() and unsign_safe_str_tuple().
+
+The suffixes are used to ensure correct work of persistent dictionaries
+(which employ SafeStrTuple-s as keys) with case-insensitive filesystems,
+e.g. MacOS HFS.
+"""
+
 import base64
 import hashlib
 from persidict.safe_str_tuple import SafeStrTuple
+
 
 def _create_signature_suffix(input_str:str, digest_len:int) -> str:
     """ Create a hash signature suffix for a string."""
@@ -43,7 +55,7 @@ def _add_all_suffixes_if_absent(
         str_seq:SafeStrTuple
         ,digest_len:int
         ) -> SafeStrTuple:
-    """Add hash signature suffixes to all strings in a SafeStrSequence."""
+    """Add hash signature suffixes to all strings in a SafeStrTuple."""
 
     str_seq = SafeStrTuple(str_seq)
 
@@ -54,6 +66,7 @@ def _add_all_suffixes_if_absent(
     new_seq = SafeStrTuple(*new_seq)
 
     return new_seq
+
 
 def _remove_signature_suffix_if_present(input_str:str, digest_len:int) -> str:
     """ Remove a hash signature suffix from a string if it's detected."""
@@ -73,11 +86,12 @@ def _remove_signature_suffix_if_present(input_str:str, digest_len:int) -> str:
 
     return input_str
 
+
 def _remove_all_signature_suffixes_if_present(
         str_seq:SafeStrTuple
         , digest_len:int
         ) -> SafeStrTuple:
-    """Remove hash signature suffixes from all strings in a SafeStrSequence."""
+    """Remove hash signature suffixes from all strings in a SafeStrTuple."""
 
     str_seq = SafeStrTuple(str_seq)
 
@@ -93,10 +107,11 @@ def _remove_all_signature_suffixes_if_present(
 
     return new_seq
 
+
 def sign_safe_str_tuple(str_seq:SafeStrTuple
                         , digest_len:int
                         ) -> SafeStrTuple:
-    """Add hash signature suffixes to all strings in a SafeStrSequence."""
+    """Add hash signature suffixes to all strings in a SafeStrTuple."""
 
     str_seq = SafeStrTuple(str_seq)
 
@@ -104,10 +119,11 @@ def sign_safe_str_tuple(str_seq:SafeStrTuple
 
     return str_seq
 
+
 def unsign_safe_str_tuple(str_seq:SafeStrTuple
                           , digest_len:int
                           ) -> SafeStrTuple:
-    """Remove hash signature suffixes from all strings in a SafeStrSequence."""
+    """Remove hash signature suffixes from all strings in a SafeStrTuple."""
 
     str_seq = SafeStrTuple(str_seq)
 
