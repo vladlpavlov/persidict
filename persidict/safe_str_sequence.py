@@ -1,7 +1,7 @@
 import base64
 import hashlib
 import string
-from collections.abc import Sequence
+from collections.abc import Sequence, Mapping
 from typing import Tuple, Any
 
 SAFE_CHARS_SET = set(string.ascii_letters + string.digits + "()_-~.=")
@@ -12,7 +12,8 @@ def _is_sequence(obj:Any)->bool:
         return True
     elif (hasattr(obj, "__getitem__") and callable(obj.__getitem__)
         and hasattr(obj, "__len__") and callable(obj.__len__)
-        and hasattr(obj, "__iter__") and callable(obj.__iter__)):
+        and hasattr(obj, "__iter__") and callable(obj.__iter__)
+        and not isinstance(obj, Mapping)):
         return True
     else:
         return False
@@ -33,7 +34,8 @@ class SafeStrSequence(Sequence):
                 assert len(set(a) - SAFE_CHARS_SET) == 0
                 candidate.append(a)
             elif _is_sequence(a):
-                candidate.extend(SafeStrSequence(*a).safe_strings)
+                if len(a) > 0:
+                    candidate.extend(SafeStrSequence(*a).safe_strings)
             else:
                 assert False, f"Invalid argument type: {type(a)}"
         self.safe_strings = tuple(candidate)

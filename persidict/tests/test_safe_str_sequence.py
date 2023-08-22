@@ -97,3 +97,16 @@ def test_flattening():
     l_3 = ['i', 'j', ['k', 'l', ('m',('n','o')) ]]
     s = SafeStrSequence(l_1, SafeStrSequence(l_2), l_3)
     assert "".join(s.safe_strings) == "abcdefghijklmno"
+
+def test_rejecting_non_strings():
+    """Test if SafeStrSequence rejects non-string elements."""
+    bad_args = [1, 2.0, 3+4j, None, True, False, object(), dict(), set()]
+    print("\n")
+    for a in bad_args:
+        print(f"{type(a)},{a}")
+        try:
+            SafeStrSequence(a)
+        except:
+            pass
+        else:
+            assert False, f"Failed to reject non-string argument {a}"
