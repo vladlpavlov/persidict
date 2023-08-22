@@ -219,6 +219,7 @@ class FileDirDict(PersiDict):
                             dir_name, start=self.base_dir)
 
                         result_key = (*splitter(prefix_key), f[:-ext_len])
+                        result_key = SafeStrTuple(result_key)
 
                         if iter_type == "keys":
                             yield unsign_safe_str_tuple(

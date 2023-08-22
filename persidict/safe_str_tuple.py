@@ -50,12 +50,18 @@ class SafeStrTuple(Sequence, Hashable):
     def __hash__(self):
         return hash(self.the_strings)
 
+    @classmethod
+    def allowed_characters(cls):
+        return SAFE_CHARS_SET
+
     def __repr__(self):
         return f"SafeStrSequence({self.the_strings})"
+
 
     def __eq__(self, other):
         assert isinstance(other, SafeStrTuple)
         return self.the_strings == other.the_strings
+
 
     def __add__(self, other):
         other = SafeStrTuple(other)
@@ -80,6 +86,8 @@ def _create_signature_suffix(input_str:str, digest_len:int) -> str:
     """ Create a hash signature suffix for a string."""
 
     assert isinstance(input_str, str)
+    assert isinstance(digest_len, int)
+    assert digest_len >= 0
 
     if digest_len == 0:
         return ""
@@ -96,6 +104,8 @@ def _add_signature_suffix_if_absent(input_str:str, digest_len:int) -> str:
     """ Add a hash signature suffix to a string if it's not there."""
 
     assert isinstance(input_str, str)
+    assert isinstance(digest_len, int)
+    assert digest_len >= 0
 
     if digest_len == 0:
         return input_str
@@ -129,6 +139,8 @@ def _remove_signature_suffix_if_present(input_str:str, digest_len:int) -> str:
     """ Remove a hash signature suffix from a string if it's detected."""
 
     assert isinstance(input_str, str)
+    assert isinstance(digest_len, int)
+    assert digest_len >= 0
 
     if digest_len == 0:
         return input_str
@@ -182,4 +194,3 @@ def unsign_safe_str_tuple(str_seq:SafeStrTuple
     str_seq = _remove_all_signature_suffixes_if_present(str_seq, digest_len)
 
     return str_seq
-

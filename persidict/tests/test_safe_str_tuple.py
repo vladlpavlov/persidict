@@ -1,4 +1,5 @@
-from persidict import SafeStrTuple, sign_safe_str_tuple, unsign_safe_str_tuple
+from persidict.safe_str_tuple import SafeStrTuple
+from persidict.safe_str_tuple import sign_safe_str_tuple, unsign_safe_str_tuple
 
 def test_add():
     """Test if SafeStrTuple concatenates correctly."""
@@ -75,11 +76,14 @@ def test_init():
 
 def test_signing_unsigning():
     l = ['a', 'b', 'c']
-    for n in range(4,20):
+    for n in range(0,20):
         s = SafeStrTuple(*l)
         signed_s = sign_safe_str_tuple(s, n)
         assert s == unsign_safe_str_tuple(signed_s, n)
-        assert s != signed_s
+        if n > 0:
+            assert s != signed_s
+        else:
+            assert s == signed_s
         assert signed_s == sign_safe_str_tuple(signed_s, n)
         assert s == unsign_safe_str_tuple(s, n)
 
