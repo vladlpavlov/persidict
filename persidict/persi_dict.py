@@ -13,7 +13,7 @@ from abc import abstractmethod
 from typing import Any, Dict
 from collections.abc import MutableMapping
 
-from .safe_str_sequence import SafeStrSequence
+from .safe_str_tuple import SafeStrTuple
 
 class PersiDict(MutableMapping):
     """Dict-like durable store that accepts sequences of strings keys.
@@ -76,25 +76,25 @@ class PersiDict(MutableMapping):
 
 
     @abstractmethod
-    def __contains__(self, key:SafeStrSequence) -> bool:
+    def __contains__(self, key:SafeStrTuple) -> bool:
         """True if the dictionary has the specified key, else False."""
         raise NotImplementedError
 
 
     @abstractmethod
-    def __getitem__(self, key:SafeStrSequence) -> Any:
+    def __getitem__(self, key:SafeStrTuple) -> Any:
         """X.__getitem__(y) is an equivalent to X[y]"""
         raise NotImplementedError
 
 
-    def __setitem__(self, key:SafeStrSequence, value:Any):
+    def __setitem__(self, key:SafeStrTuple, value:Any):
         """Set self[key] to value."""
         if self.immutable_items: # TODO: change to exceptions
             assert key not in self, "Can't modify an immutable key-value pair"
         raise NotImplementedError
 
 
-    def __delitem__(self, key:SafeStrSequence):
+    def __delitem__(self, key:SafeStrTuple):
         """Delete self[key]."""
         if self.immutable_items: # TODO: change to exceptions
             assert False, "Can't delete an immutable key-value pair"
@@ -134,7 +134,7 @@ class PersiDict(MutableMapping):
         return self._generic_iter("items")
 
 
-    def setdefault(self, key:SafeStrSequence, default:Any=None) -> Any:
+    def setdefault(self, key:SafeStrTuple, default:Any=None) -> Any:
         """Insert key with a value of default if key is not in the dictionary.
 
         Return the value for key if key is in the dictionary, else default.
@@ -166,7 +166,7 @@ class PersiDict(MutableMapping):
 
 
     @abstractmethod
-    def mtimestamp(self,key:SafeStrSequence) -> float:
+    def mtimestamp(self, key:SafeStrTuple) -> float:
         """Get last modification time (in seconds, Unix epoch time).
 
         This method is absent in the original dict API.
@@ -180,7 +180,7 @@ class PersiDict(MutableMapping):
             del self[k]
 
 
-    def quiet_delete(self, key:SafeStrSequence):
+    def quiet_delete(self, key:SafeStrTuple):
         """ Delete an item without raising an exception if it doesn't exist.
 
         This method is absent in the original dict API, it is added here
@@ -196,7 +196,7 @@ class PersiDict(MutableMapping):
             pass
 
 
-    def get_subdict(self, prefix_key:SafeStrSequence) -> PersiDict:
+    def get_subdict(self, prefix_key:SafeStrTuple) -> PersiDict:
         """Get a subdictionary containing items with the same prefix_key.
 
         This method is absent in the original dict API.

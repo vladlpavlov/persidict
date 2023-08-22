@@ -17,7 +17,7 @@ import jsonpickle
 import jsonpickle.ext.numpy as jsonpickle_numpy
 import jsonpickle.ext.pandas as jsonpickle_pandas
 
-from .safe_str_sequence import SafeStrSequence, sign_safe_str_sequence, unsign_safe_str_sequence
+from .safe_str_tuple import SafeStrTuple, sign_safe_str_tuple, unsign_safe_str_tuple
 from .persi_dict import PersiDict
 
 class FileDirDict(PersiDict):
@@ -98,13 +98,13 @@ class FileDirDict(PersiDict):
                 os.rmdir(subdir_name)
 
     def _build_full_path(self
-                         , key:SafeStrSequence
+                         , key:SafeStrTuple
                          , create_subdirs:bool=False
                          , is_file_path:bool=True) -> str:
         """Convert a key into a filesystem path."""
 
-        key = sign_safe_str_sequence(key, self.digest_len)
-        key = [self.base_dir] + list(key.safe_strings)
+        key = sign_safe_str_tuple(key, self.digest_len)
+        key = [self.base_dir] + list(key.the_strings)
         dir_names = key[:-1] if is_file_path else key
 
         if create_subdirs:
@@ -122,7 +122,7 @@ class FileDirDict(PersiDict):
             return os.path.join(*dir_names)
 
 
-    def get_subdict(self, key:SafeStrSequence):
+    def get_subdict(self, key:SafeStrTuple):
         """Get a subdictionary containing items with the same prefix_key.
 
         This method is absent in the original dict API.
@@ -159,13 +159,13 @@ class FileDirDict(PersiDict):
         else:
             raise ValueError("file_type must be either pkl or json")
 
-    def __contains__(self, key:SafeStrSequence) -> bool:
+    def __contains__(self, key:SafeStrTuple) -> bool:
         """True if the dictionary has the specified key, else False. """
 
         filename = self._build_full_path(key)
         return os.path.isfile(filename)
 
-    def __getitem__(self, key:SafeStrSequence) -> Any:
+    def __getitem__(self, key:SafeStrTuple) -> Any:
         """ Implementation for x[y] syntax. """
 
         filename = self._build_full_path(key)
@@ -174,7 +174,7 @@ class FileDirDict(PersiDict):
         result = self._read_from_file(filename)
         return result
 
-    def __setitem__(self, key:SafeStrSequence, value:Any):
+    def __setitem__(self, key:SafeStrTuple, value:Any):
         """Set self[key] to value."""
 
         filename = self._build_full_path(key, create_subdirs=True)
@@ -183,7 +183,7 @@ class FileDirDict(PersiDict):
                 "Can't modify an immutable item")
         self._save_to_file(filename, value)
 
-    def __delitem__(self, key:SafeStrSequence) -> None:
+    def __delitem__(self, key:SafeStrTuple) -> None:
         """Delete self[key]."""
 
         assert not self.immutable_items, "Can't delete immutable items"
@@ -221,18 +221,18 @@ class FileDirDict(PersiDict):
                         result_key = (*splitter(prefix_key), f[:-ext_len])
 
                         if iter_type == "keys":
-                            yield unsign_safe_str_sequence(
+                            yield unsign_safe_str_tuple(
                                 result_key, self.digest_len)
                         elif iter_type == "values":
                             yield self[result_key]
                         else:
-                            yield (unsign_safe_str_sequence(
+                            yield (unsign_safe_str_tuple(
                                 result_key, self.digest_len), self[result_key])
 
         return step()
 
 
-    def mtimestamp(self,key:SafeStrSequence) -> float:
+    def mtimestamp(self, key:SafeStrTuple) -> float:
         """Get last modification time (in seconds, Unix epoch time).
 
         This method is absent in the original dict API.

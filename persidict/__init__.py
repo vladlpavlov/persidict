@@ -18,5 +18,5 @@ as a pickle or a json S3 object.
 
 from .persi_dict import PersiDict
 from .file_dir_dict import FileDirDict
-from .safe_str_sequence import (SafeStrSequence
-    , sign_safe_str_sequence, unsign_safe_str_sequence)
+from .safe_str_tuple import (SafeStrTuple
+    , sign_safe_str_tuple, unsign_safe_str_tuple)
