@@ -76,3 +76,16 @@ def test_signing_unsigning():
         assert s != signed_s
         assert signed_s == sign_safe_str_sequence(signed_s, n)
         assert s == unsign_safe_str_sequence(s, n)
+
+def test_unsafe_chars():
+    """Test if SafeStrSequence rejects unsafe characters."""
+    bad_chars = ['\n', '\t', '\r', '\b', '\x0b']
+    bad_chars += [ '\x0c', '\x1c', '\x1d', '\x1e', '\x1f']
+
+    for c in bad_chars:
+        try:
+            SafeStrSequence("qwerty"+c+"uiop")
+        except:
+            pass
+        else:
+            assert False, f"Failed to reject unsafe character {c}"
