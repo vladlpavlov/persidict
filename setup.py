@@ -5,7 +5,7 @@ with open("README.md", "r") as f:
 
 setuptools.setup(
     name="persidict"
-    ,version="0.0.4"
+    ,version="0.0.5"
     ,author="Vlad (Volodymyr) Pavlov"
     ,author_email="vlpavlov@ieee.org"
     ,description= "Simple persistent key-value store for Python. " 
