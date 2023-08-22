@@ -1,5 +1,5 @@
 from persidict.safe_str_tuple import SafeStrTuple
-from persidict.safe_str_tuple import sign_safe_str_tuple, unsign_safe_str_tuple
+from persidict.safe_str_tuple_signing import sign_safe_str_tuple, unsign_safe_str_tuple
 
 def test_add():
     """Test if SafeStrTuple concatenates correctly."""

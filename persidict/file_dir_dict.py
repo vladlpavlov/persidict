@@ -17,7 +17,8 @@ import jsonpickle
 import jsonpickle.ext.numpy as jsonpickle_numpy
 import jsonpickle.ext.pandas as jsonpickle_pandas
 
-from .safe_str_tuple import SafeStrTuple, sign_safe_str_tuple, unsign_safe_str_tuple
+from .safe_str_tuple import SafeStrTuple
+from .safe_str_tuple_signing import sign_safe_str_tuple, unsign_safe_str_tuple
 from .persi_dict import PersiDict
 
 class FileDirDict(PersiDict):
