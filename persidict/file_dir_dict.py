@@ -127,6 +127,7 @@ class FileDirDict(PersiDict):
 
         This method is absent in the original dict API.
         """
+        key = SafeStrTuple(key)
         full_dir_path = self._build_full_path(
             key, create_subdirs = True, is_file_path = False)
         return FileDirDict(
@@ -161,13 +162,13 @@ class FileDirDict(PersiDict):
 
     def __contains__(self, key:SafeStrTuple) -> bool:
         """True if the dictionary has the specified key, else False. """
-
+        key = SafeStrTuple(key)
         filename = self._build_full_path(key)
         return os.path.isfile(filename)
 
     def __getitem__(self, key:SafeStrTuple) -> Any:
         """ Implementation for x[y] syntax. """
-
+        key = SafeStrTuple(key)
         filename = self._build_full_path(key)
         if not os.path.isfile(filename):
             raise KeyError(f"File {filename} does not exist")
@@ -176,7 +177,7 @@ class FileDirDict(PersiDict):
 
     def __setitem__(self, key:SafeStrTuple, value:Any):
         """Set self[key] to value."""
-
+        key = SafeStrTuple(key)
         filename = self._build_full_path(key, create_subdirs=True)
         if self.immutable_items:
             assert not os.path.exists(filename), (
@@ -185,7 +186,7 @@ class FileDirDict(PersiDict):
 
     def __delitem__(self, key:SafeStrTuple) -> None:
         """Delete self[key]."""
-
+        key = SafeStrTuple(key)
         assert not self.immutable_items, "Can't delete immutable items"
         filename = self._build_full_path(key)
         if not os.path.isfile(filename):
