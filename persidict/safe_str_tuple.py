@@ -24,7 +24,7 @@ class SafeStrTuple(Sequence, Hashable):
     """An immutable sequence of non-emtpy URL/filename-safe strings.
     """
 
-    the_strings: Tuple[str, ...]
+    s_chain: Tuple[str, ...]
 
     def __init__(self, *args):
         """Create a SafeStrTuple from a sequence/tree of strings.
@@ -39,29 +39,29 @@ class SafeStrTuple(Sequence, Hashable):
         candidate = []
         for a in args:
             if isinstance(a, SafeStrTuple):
-                candidate.extend(a.the_strings)
+                candidate.extend(a.s_chain)
             elif isinstance(a, str):
                 assert len(a) > 0
                 assert len(set(a) - SAFE_CHARS_SET) == 0
                 candidate.append(a)
             elif _is_sequence_not_mapping(a):
                 if len(a) > 0:
-                    candidate.extend(SafeStrTuple(*a).the_strings)
+                    candidate.extend(SafeStrTuple(*a).s_chain)
             else:
                 assert False, f"Invalid argument type: {type(a)}"
-        self.the_strings = tuple(candidate)
+        self.s_chain = tuple(candidate)
 
     def __getitem__(self, key):
         """Return a string at position key."""
-        return self.the_strings[key]
+        return self.s_chain[key]
 
     def __len__(self):
         """Return the number of strings in the tuple."""
-        return len(self.the_strings)
+        return len(self.s_chain)
 
     def __hash__(self):
         """Return a hash of the tuple."""
-        return hash(self.the_strings)
+        return hash(self.s_chain)
 
     @classmethod
     def allowed_characters(cls):
@@ -70,33 +70,33 @@ class SafeStrTuple(Sequence, Hashable):
 
     def __repr__(self):
         """Return repr(self)."""
-        return f"SafeStrSequence({self.the_strings})"
+        return f"SafeStrSequence({self.s_chain})"
 
 
     def __eq__(self, other):
         """Return self == other."""
         assert isinstance(other, SafeStrTuple)
-        return self.the_strings == other.the_strings
+        return self.s_chain == other.s_chain
 
 
     def __add__(self, other):
         """Return self + other."""
         other = SafeStrTuple(other)
-        return SafeStrTuple(*(self.the_strings + other.the_strings))
+        return SafeStrTuple(*(self.s_chain + other.s_chain))
 
     def __radd__(self, other):
         """Return other + self."""
         other = SafeStrTuple(other)
-        return SafeStrTuple(*(other.the_strings + self.the_strings))
+        return SafeStrTuple(*(other.s_chain + self.s_chain))
 
     def __iter__(self):
         """Return iter(self)."""
-        return iter(self.the_strings)
+        return iter(self.s_chain)
 
     def __contains__(self, item):
         """Return item in self."""
-        return item in self.the_strings
+        return item in self.s_chain
 
     def __reversed__(self):
         """Return a reversed SafeStrTuple."""
-        return SafeStrTuple(*reversed(self.the_strings))
+        return SafeStrTuple(*reversed(self.s_chain))
