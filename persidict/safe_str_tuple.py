@@ -5,13 +5,14 @@ from typing import Tuple, Any
 SAFE_CHARS_SET = set(string.ascii_letters + string.digits + "()_-~.=")
 
 def _is_sequence_not_mapping(obj:Any)->bool:
-    """Check if obj is a sequence."""
+    """Check if obj is a sequence (e.g. list) but not a mapping (e.g. dict)."""
     if isinstance(obj, Sequence) and not isinstance(obj, Mapping):
         return True
+    elif hasattr(obj, "keys") and callable(obj.keys):
+        return False
     elif (hasattr(obj, "__getitem__") and callable(obj.__getitem__)
         and hasattr(obj, "__len__") and callable(obj.__len__)
-        and hasattr(obj, "__iter__") and callable(obj.__iter__)
-        and not isinstance(obj, Mapping)):
+        and hasattr(obj, "__iter__") and callable(obj.__iter__)):
         return True
     else:
         return False
