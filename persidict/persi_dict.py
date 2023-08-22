@@ -1,12 +1,19 @@
-"""Core datatypes used in persistent dictionaries' hierarchy.
-
-The module offers 2 types: PersiDict and PersiDictKey.
+"""PersiDict: base class used in persistent dictionaries' hierarchy.
 
 PersiDict: a base class in the hierarchy, defines unified interface
-of all persistent dictionaries.
+of all persistent dictionaries. The interface is similar to the interface of
+Python's built-in Dict, with a few variations
+(e.g. insertion order is not preserved) and additional methods.
 
-PersiDictKey: a value which can be used as a key for PersiDict.
+PersiDict persistently stores key-value pairs.
+A key is a sequence of strings in a form of SafeStrTuple.
+A value can be any Python object.
+
+'Persstently' means that key-value pairs are saved in a durable storage,
+such as a local hard-drive or AWS S3 cloud, and can be retrieved
+even after the Python process that created the dictionary has terminated.
 """
+
 from __future__ import annotations
 
 from abc import abstractmethod
@@ -16,7 +23,7 @@ from collections.abc import MutableMapping
 from .safe_str_tuple import SafeStrTuple
 
 class PersiDict(MutableMapping):
-    """Dict-like durable store that accepts sequences of strings keys.
+    """Dict-like durable store that accepts sequences of strings as keys.
 
     An abstract base class for key-value stores. It accepts keys in a form of
     SafeStrSequence - a URL/filename-safe sequence of strings.
@@ -38,7 +45,7 @@ class PersiDict(MutableMapping):
                       False means normal dict-like behaviour.
 
     digest_len : int
-                 Length of a hash signature suffix which SimplePersistentDict
+                 Length of a hash signature suffix which PersiDict
                  automatically adds to each string in a key
                  while mapping the key to an address of a value
                  in a persistent storage backend (e.g. a filename
@@ -54,7 +61,7 @@ class PersiDict(MutableMapping):
     def __init__(self
                  , immutable_items:bool
                  , digest_len:int = 8
-                 , **kwargas):
+                 , *args, **kwargas):
         assert digest_len >= 0
         self.digest_len = int(digest_len)
         self.immutable_items = bool(immutable_items)
