@@ -10,13 +10,12 @@ def _is_sequence(obj:Any)->bool:
     """Check if obj is a sequence."""
     if isinstance(obj, Sequence):
         return True
+    elif (hasattr(obj, "__getitem__") and callable(obj.__getitem__)
+        and hasattr(obj, "__len__") and callable(obj.__len__)
+        and hasattr(obj, "__iter__") and callable(obj.__iter__)):
+        return True
     else:
-        try:
-            if callable(obj.__getitem__) and callable(obj.__len__):
-                return True
-        except:
-            pass
-    return False
+        return False
 
 class SafeStrSequence(Sequence):
     """A sequence of non-emtpy URL/filename-safe strings.

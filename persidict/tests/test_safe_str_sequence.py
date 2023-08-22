@@ -89,3 +89,11 @@ def test_unsafe_chars():
             pass
         else:
             assert False, f"Failed to reject unsafe character {c}"
+
+def test_flattening():
+    """Test if SafeStrSequence flattens nested sequences."""
+    l_1 = ['a', 'b', 'c']
+    l_2 = ['d', 'e', ('f','g'), 'h']
+    l_3 = ['i', 'j', ['k', 'l', ('m',('n','o')) ]]
+    s = SafeStrSequence(l_1, SafeStrSequence(l_2), l_3)
+    assert "".join(s.safe_strings) == "abcdefghijklmno"
