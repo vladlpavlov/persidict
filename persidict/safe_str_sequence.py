@@ -47,9 +47,6 @@ class SafeStrSequence(Sequence):
     def __repr__(self):
         return f"SafeStrSequence({self.safe_strings})"
 
-    # def __str__(self):
-    #     return self.__repr__()
-
     def __eq__(self, other):
         assert isinstance(other, SafeStrSequence)
         return self.safe_strings == other.safe_strings
