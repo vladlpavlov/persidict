@@ -159,9 +159,9 @@ def _remove_all_signature_suffixes_if_present(
 
     return new_seq
 
-def sign_safe_string_sequence(str_seq:SafeStrSequence
-        , digest_len:int
-        ) -> SafeStrSequence:
+def sign_safe_str_sequence(str_seq:SafeStrSequence
+                           , digest_len:int
+                           ) -> SafeStrSequence:
     """Add hash signature suffixes to all strings in a SafeStrSequence."""
 
     str_seq = SafeStrSequence(str_seq)
@@ -170,9 +170,9 @@ def sign_safe_string_sequence(str_seq:SafeStrSequence
 
     return str_seq
 
-def unsign_safe_string_sequence(str_seq:SafeStrSequence
-        , digest_len:int
-        ) -> SafeStrSequence:
+def unsign_safe_str_sequence(str_seq:SafeStrSequence
+                             , digest_len:int
+                             ) -> SafeStrSequence:
     """Remove hash signature suffixes from all strings in a SafeStrSequence."""
 
     str_seq = SafeStrSequence(str_seq)

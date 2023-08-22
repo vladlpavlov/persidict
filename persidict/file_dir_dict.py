@@ -20,7 +20,7 @@ import jsonpickle
 import jsonpickle.ext.numpy as jsonpickle_numpy
 import jsonpickle.ext.pandas as jsonpickle_pandas
 
-from .safe_str_sequence import SafeStrSequence, sign_safe_string_sequence, unsign_safe_string_sequence
+from .safe_str_sequence import SafeStrSequence, sign_safe_str_sequence, unsign_safe_str_sequence
 from .persi_dict import PersiDict
 
 class FileDirDict(PersiDict):
@@ -106,7 +106,7 @@ class FileDirDict(PersiDict):
                          , is_file_path:bool=True) -> str:
         """Convert a key into a filesystem path."""
 
-        key = sign_safe_string_sequence(key, self.digest_len)
+        key = sign_safe_str_sequence(key, self.digest_len)
         key = [self.base_dir] + list(key.safe_strings)
         dir_names = key[:-1] if is_file_path else key
 
@@ -224,12 +224,12 @@ class FileDirDict(PersiDict):
                         result_key = (*splitter(prefix_key), f[:-ext_len])
 
                         if iter_type == "keys":
-                            yield unsign_safe_string_sequence(
+                            yield unsign_safe_str_sequence(
                                 result_key, self.digest_len)
                         elif iter_type == "values":
                             yield self[result_key]
                         else:
-                            yield (unsign_safe_string_sequence(
+                            yield (unsign_safe_str_sequence(
                                 result_key, self.digest_len), self[result_key])
 
         return step()

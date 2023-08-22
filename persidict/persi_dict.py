@@ -13,7 +13,7 @@ from abc import abstractmethod
 from typing import Any, Tuple, Union, Sequence, Dict
 from collections.abc import MutableMapping
 
-from .safe_str_sequence import SafeStrSequence, sign_safe_string_sequence, unsign_safe_string_sequence
+from .safe_str_sequence import SafeStrSequence, sign_safe_str_sequence, unsign_safe_str_sequence
 
 # def persi_dict_key(key:PersiDictKey) -> PersiDictKey:
 #     """Check if a key meets requirements and return its standardized form.
