@@ -110,3 +110,21 @@ def test_rejecting_non_strings():
             pass
         else:
             assert False, f"Failed to reject non-string argument {a}"
+
+def test_rejecting_empty_strings():
+    """Test if SafeStrSequence rejects empty strings."""
+    try:
+        SafeStrSequence("")
+    except:
+        pass
+    else:
+        assert False, "Failed to reject empty string"
+
+def test_rejecting_empty_sequences():
+    """Test if SafeStrSequence rejects empty sequences."""
+    try:
+        SafeStrSequence()
+    except:
+        pass
+    else:
+        assert False, "Failed to reject empty sequence"

@@ -25,6 +25,7 @@ class SafeStrSequence(Sequence):
     safe_strings: Tuple[str, ...]
 
     def __init__(self, *args):
+        assert len(args) > 0
         candidate = []
         for a in args:
             if isinstance(a, SafeStrSequence):
