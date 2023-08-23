@@ -1,9 +1,6 @@
-# from pythagoras.persistent_dicts import FileDirDict, S3_Dict
-from persidict import FileDirDict
-# from persidict import S3_Dict
+from persidict import FileDirDict, SafeStrTuple
 import pandas as pd
 # from moto import mock_s3
-
 
 def validate_basics(dict_to_test):
     dict_to_test.clear()
@@ -34,6 +31,7 @@ def validate_basics(dict_to_test):
 
 
 def validate_iterators(dict_to_test):
+    """Test if iterators work correctly."""
     dict_to_test.clear()
     model_dict = dict()
     assert len(dict_to_test) == len(model_dict) == 0
@@ -68,34 +66,108 @@ def validate_case_sensitivity(dict_to_test):
 
     dict_to_test.clear()
 
-
-def validate_dict_object(dict_to_test):
-    validate_basics(dict_to_test)
-    validate_case_sensitivity(dict_to_test)
-    validate_iterators(dict_to_test)
+def validate_complex_keys(dict_to_test):
+    """Test if compound keys work correctly."""
     dict_to_test.clear()
     model_dict = dict()
 
-    assert len(dict_to_test) == len(model_dict) == 0
+    for k in [("a", "a_1"), ("a", "a_2"), ("b", "b_1", "b_2", "b_3")]:
+        dict_to_test[k] = 2*str(k)
+        model_dict[k] = 2*str(k)
+        assert len(dict_to_test) == len(model_dict)
+        assert dict_to_test[k] == model_dict[k]
+
+    dict_to_test.clear()
+
+def validate_subdicts(dict_to_test):
+    """Test if get_subdict() works correctly."""
+    dict_to_test.clear()
+    model_dict = dict()
+
+    fdd = dict_to_test
+    fdd[("a", "a_1")] = 10
+    fdd[("a", "a_2")] = 100
+    fdd[("b", "b_1")] = 1000
+    assert len(fdd.get_subdict("a")) == 2
+    assert len(fdd.get_subdict("b")) == 1
+    fdd.clear()
+    assert len(fdd.get_subdict("a")) == 0
+    assert len(fdd.get_subdict("b")) == 0
+
+def validate_work_with_basic_datatypes(dict_to_test):
+    sample_data = [ [1,2,3,4,5]
+                    ,["a","b","c","d","e"]
+                    ,[i*i/3.14 for i in range(55)]
+                    ,[str(i)*i for i in range(33)]
+                    ,(1,2,3,4,5)
+                    ,{"a":1,"b":2,"c":3,"d":4,"e":5}
+                    ,{1,2,3,4,5}
+                    ,True
+                    ,(1,2,3,4,5,(6,7,8,9,10,(11,12,13,14,15)))
+                    ]
+    dict_to_test.clear()
+    model_dict = dict()
+    for i,d in enumerate(sample_data):
+        dict_to_test[str(i)] = d
+        model_dict[str(i)] = d
+        assert len(dict_to_test) == len(model_dict)
+        assert dict_to_test[str(i)] == model_dict[str(i)]
+
+    assert dict_to_test == model_dict
+
+    dict_to_test.clear()
+
+def validate_work_with_pandas(dict_to_test):
+    """Validate how dict_to_test works with various pandas data types."""
+    dict_to_test.clear()
+    model_dict = dict()
+
+    dict_to_test["z"] = pd.DataFrame({"a": [1, 2, 3, 4, 5]})
+    model_dict["z"] = pd.DataFrame({"a": [1, 2, 3, 4, 5]})
+    assert (dict_to_test["z"] == model_dict["z"]).sum().sum() == 5
+
+    dict_to_test["zz"] = pd.Series([1, 2, 3, 4, 5, 6])
+    model_dict["zz"] = pd.Series([1, 2, 3, 4, 5, 6])
+    assert (dict_to_test["zz"] == model_dict["zz"]).sum() == 6
+
+    dict_to_test["zzz"] = pd.Index([1, 2, 3, 4])
+    model_dict["zzz"] = pd.Index([1, 2, 3, 4])
+    assert (dict_to_test["zzz"] == model_dict["zzz"]).sum() == 4
+
+    dict_to_test["zzzz"] = pd.RangeIndex(0, 15)
+    model_dict["zzzz"] = pd.RangeIndex(0, 15)
+    assert (dict_to_test["zzzz"] == model_dict["zzzz"]).sum() == 15
+
+    #TODO: add MultiIndex tests
+
+    dict_to_test.clear()
+
+def validate_more_dict_methods(dict_to_test):
+    dict_to_test.clear()
+    model_dict = dict()
 
     for i in range(10):
         k = ("_"+str(10*i),)
+        k = SafeStrTuple(k)
         dict_to_test[k] = i + 1
         model_dict[k] = i + 1
 
         k = (i + 1) * (str(i) + "zz",)
+        k = SafeStrTuple(k)
         fake_k = (i + 1) * (str(i) + "aa",)
+        fake_k = SafeStrTuple(fake_k)
         dict_to_test[k] = "hihi"
         model_dict[k] = "hihi"
 
         assert k in dict_to_test
         assert fake_k not in dict_to_test
-        assert k+("1",) not in dict_to_test
-
+        assert SafeStrTuple(k+"UUUU") not in dict_to_test
 
         new_key = ("new_key", str(i))
+        new_key = SafeStrTuple(new_key)
+
         assert (dict_to_test.setdefault(new_key, 1) ==
-                model_dict.setdefault(("new_key", str(i)), 1))
+                model_dict.setdefault(new_key, 1))
 
         assert (dict_to_test.setdefault(new_key, 2) ==
                 model_dict.setdefault(new_key, 2))
@@ -105,35 +177,23 @@ def validate_dict_object(dict_to_test):
 
     assert dict_to_test == dict_to_test
     assert dict_to_test == model_dict
+
     for v in model_dict:
         assert v in dict_to_test
 
-
-    for j in range(len(dict_to_test)):
-        dict_to_test.popitem()
-        model_dict.popitem()
-
-    assert len(dict_to_test) == 0
-
-    dict_to_test["z"] = pd.DataFrame({"a": [1, 2, 3, 4, 5]})
-    model_dict["z"] = pd.DataFrame({"a": [1, 2, 3, 4, 5]})
-    assert (dict_to_test["z"] == model_dict["z"]).sum().sum() == 5
-
     dict_to_test.clear()
-    model_dict.clear()
 
-    assert len(dict_to_test) == 0
 
+def validate_dict_object(dict_to_test):
+    validate_basics(dict_to_test)
+    validate_case_sensitivity(dict_to_test)
+    validate_iterators(dict_to_test)
+    validate_complex_keys(dict_to_test)
+    validate_subdicts(dict_to_test)
+    validate_work_with_basic_datatypes(dict_to_test)
+    validate_work_with_pandas(dict_to_test)
+    validate_more_dict_methods(dict_to_test)
     dict_to_test.clear()
-    fdd = dict_to_test
-    fdd[("a", "a_1")] = 10
-    fdd[("a", "a_2")] = 100
-    fdd[("b", "b_1")] = 1000
-    assert len(fdd.get_subdict("a")) == 2
-    assert len(fdd.get_subdict("b")) == 1
-    fdd.clear()
-    assert len(fdd.get_subdict("a")) == 0
-
 
 def test_FileDirDict(tmpdir):
     p = FileDirDict(dir_name = tmpdir, file_type="pkl")
@@ -145,7 +205,7 @@ def test_FileDirDict(tmpdir):
     j = FileDirDict(dir_name = tmpdir, file_type="json")
     validate_dict_object(j)
 
-#
+
 # @mock_s3
 # def test_S3_Dict(tmpdir):
 #     d = S3_Dict(bucket_name ="TEST",dir_name = tmpdir)
@@ -156,13 +216,3 @@ def test_FileDirDict(tmpdir):
 #
 #     d_p = S3_Dict(bucket_name="TEST", file_type="pkl",dir_name = tmpdir)
 #     validate_dict_object(d_p)
-
-def test_demo(tmpdir):
-    print("\n")
-    p = FileDirDict(dir_name=tmpdir, file_type="pkl")
-    p["a","bb"] = 1
-    p["a", "bbbbbb"] = 2
-    p["y", "bb"] = 100
-    print(p.subdicts())
-
-
