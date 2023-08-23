@@ -21,6 +21,9 @@ from .safe_str_tuple import SafeStrTuple
 from .safe_str_tuple_signing import sign_safe_str_tuple, unsign_safe_str_tuple
 from .persi_dict import PersiDict
 
+jsonpickle_numpy.register_handlers()
+jsonpickle_pandas.register_handlers()
+
 class FileDirDict(PersiDict):
     """ A persistent Dict that stores key-value pairs in local files.
 
