@@ -40,7 +40,8 @@ class FileDirDict(PersiDict):
     def __init__(self
                  , dir_name: str = "FileDirDict"
                  , file_type: str = "pkl"
-                 , immutable_items:bool = False):
+                 , immutable_items:bool = False
+                 , digest_len:int = 8):
         """A constructor defines location of the store and file format to use.
 
         dir_name is a directory that will contain all the files in
@@ -51,7 +52,8 @@ class FileDirDict(PersiDict):
         to store values.
         """
 
-        super().__init__(immutable_items = immutable_items)
+        super().__init__(immutable_items = immutable_items
+                ,digetst_len = digest_len)
 
         self.file_type = file_type
 

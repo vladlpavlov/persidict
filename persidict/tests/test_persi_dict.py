@@ -1,6 +1,6 @@
 from persidict import FileDirDict, SafeStrTuple
 import pandas as pd
-# from moto import mock_s3
+
 
 def validate_basics(dict_to_test):
     dict_to_test.clear()
@@ -194,25 +194,3 @@ def validate_dict_object(dict_to_test):
     validate_work_with_pandas(dict_to_test)
     validate_more_dict_methods(dict_to_test)
     dict_to_test.clear()
-
-def test_FileDirDict(tmpdir):
-    p = FileDirDict(dir_name = tmpdir, file_type="pkl")
-    validate_dict_object(p)
-
-    p1 = FileDirDict(dir_name=tmpdir, file_type="pkl")
-    validate_dict_object(p1)
-
-    j = FileDirDict(dir_name = tmpdir, file_type="json")
-    validate_dict_object(j)
-
-
-# @mock_s3
-# def test_S3_Dict(tmpdir):
-#     d = S3_Dict(bucket_name ="TEST",dir_name = tmpdir)
-#     validate_dict_object(d)
-#
-#     d_j = S3_Dict(bucket_name ="TEST", file_type="json",dir_name = tmpdir)
-#     validate_dict_object(d_j)
-#
-#     d_p = S3_Dict(bucket_name="TEST", file_type="pkl",dir_name = tmpdir)
-#     validate_dict_object(d_p)

@@ -22,3 +22,4 @@ as a pickle or a json S3 object.
 from .safe_str_tuple import SafeStrTuple
 from .persi_dict import PersiDict
 from .file_dir_dict import FileDirDict
+from .s3_dict import S3Dict
