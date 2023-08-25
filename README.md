@@ -23,10 +23,9 @@ in a folder on a disk.
 
 Once created, it can be used as a regular Python dictionary:
 
-    my_dictionary["Eliza"] = "MIT Eliza was a mock Rogerian psychotherapist."
+    my_dictionary["Eliza"] = "MIT Eliza was a mock psychotherapist."
     my_dictionary["Eliza","year"] = 1965
-    my_dictionary["Eliza","authors"] = ["Joseph Weizenbaum"
-        ,"George Bernard Shaw"]
+    my_dictionary["Eliza","authors"] = ["Joseph Weizenbaum"]
     
     my_dictionary["Shoebox"] = ("IBM Shoebox performed arithmetic on voice command.")
     my_dictionary["Shoebox", "year"] = 1961
@@ -39,11 +38,11 @@ Once created, it can be used as a regular Python dictionary:
 
 If you run the code above, it will produce the following output:
 
-    >>> ['Eliza'] == MIT Eliza was a mock Rogerian psychotherapist.
+    >>> ['Eliza'] == MIT Eliza was a mock psychotherapist.
     >>> ['Shoebox'] == IBM Shoebox performed arithmetic on voice command.
     >>> ['Shoebox', 'authors'] == ['W.C. Dersch', 'E.A. Quade']
     >>> ['Shoebox', 'year'] == 1961
-    >>> ['Eliza', 'authors'] == ['Joseph Weizenbaum', 'George Bernard Shaw']
+    >>> ['Eliza', 'authors'] == ['Joseph Weizenbaum']
     >>> ['Eliza', 'year'] == 1965
 
 
@@ -65,11 +64,11 @@ because the data was stored on a disk.
 Technically, FileDirDict saves its content in a folder on a local disk. 
 But you can share this folder with other machines 
 (for example, using Dropbox or NFS), and work with the same dictionary 
-on multiple machines (from multiple instances of your program) simultaneously. 
+simultaneously from multiple computers (from multiple instances of your program). 
 This approach would allow you to use a persistent dictionary in 
-a system that is distributed over dozens, even hundreds of computers.
+a system that is distributed over dozens or hundreds of computers.
 
-If you anticipate to run your program on thousands (or more) computers, 
+If you need to run your program on thousands (or more) computers, 
 class 'S3Dict' is a better choice: it's a persistent dictionary that 
 stores its content in an AWS S3 bucket.
 
@@ -94,7 +93,7 @@ in an AWS S3 bucket.
 * You can use square brackets to get, set, or delete values. 
 * You can iterate over keys, values, or items. 
 * You can check if a key is in the dictionary. 
-* You can check whether two dicts are equal 
+* You can check whether two dicts are equal.
 (meaning they contain the same key-value pairs).
 * You can get the length of the dictionary.
 * Methods `keys()`, `values()`, `items()`, `get()`, `clear()`
@@ -106,12 +105,12 @@ in an AWS S3 bucket.
 as well as allow simultaneously run programs to work with the same instance 
 of a dictionary.
 
-* Insertion order is not preserved
-* Keys must be sequences of URL/filename-safe non-empty strings
-* Values must be pickleable Python objects
+* Keys must be sequences of URL/filename-safe non-empty strings.
+* Values must be pickleable Python objects.
+* Insertion order is not preserved.
+* You can not assign initial key-value pairs to a dictionary in its constructor.
 * Methods `quiet_delete()`, `mtimestamp()`, `get_subdict()` and `subdicts()` 
 are available
-* You can not assign initial key-value pairs to a dictionary in its constructor
 
 ## How To Get It?
 
