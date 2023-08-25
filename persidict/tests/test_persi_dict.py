@@ -1,8 +1,46 @@
-from persidict import FileDirDict, SafeStrTuple
+import pytest
+from moto import mock_s3
+
+from persidict import FileDirDict, S3Dict, SafeStrTuple
 import pandas as pd
 
 
-def validate_basics(dict_to_test):
+mutable_tests = [
+
+(FileDirDict, dict(file_type="pkl", digest_len=11))
+,(FileDirDict, dict(file_type="json", digest_len=11))
+,(S3Dict, dict(file_type="pkl", bucket_name="my_bucket", digest_len=11))
+,(S3Dict, dict(file_type="json", bucket_name="his_bucket", digest_len=11))
+
+,(FileDirDict, dict(file_type="pkl"))
+,(FileDirDict, dict(file_type="json"))
+,(S3Dict, dict(file_type="pkl", bucket_name="her_bucket"))
+,(S3Dict, dict(file_type="json", bucket_name="their_bucket"))
+
+,(S3Dict, dict(file_type="pkl", bucket_name="a_bucket", root_prefix = "_"))
+,(S3Dict, dict(file_type="json", bucket_name="the_bucket", root_prefix = "OYO"))
+
+]
+
+@pytest.mark.parametrize("DictToTest, kwargs", mutable_tests)
+@mock_s3
+def test_case_sensitivity(tmpdir, DictToTest, kwargs):
+    dict_to_test = DictToTest(dir_name = tmpdir, **kwargs)
+    dict_to_test.clear()
+    model_dict = dict()
+
+    for s in ["aaAA", "AAaa", "AAAA", "aaaa", "aAaA", "aAaa"]:
+        dict_to_test[s] = s + s
+        model_dict[s] = s + s
+        assert len(dict_to_test) == len(model_dict)
+        assert dict_to_test[s] == model_dict[s]
+
+    dict_to_test.clear()
+
+@pytest.mark.parametrize("DictToTest, kwargs", mutable_tests)
+@mock_s3
+def test_basics(tmpdir, DictToTest, kwargs):
+    dict_to_test = DictToTest(dir_name=tmpdir, **kwargs)
     dict_to_test.clear()
     model_dict = dict()
     assert len(dict_to_test) == len(model_dict) == 0
@@ -29,9 +67,11 @@ def validate_basics(dict_to_test):
 
     dict_to_test.clear()
 
-
-def validate_iterators(dict_to_test):
+@pytest.mark.parametrize("DictToTest, kwargs", mutable_tests)
+@mock_s3
+def test_iterators(tmpdir, DictToTest, kwargs):
     """Test if iterators work correctly."""
+    dict_to_test = DictToTest(dir_name=tmpdir, **kwargs)
     dict_to_test.clear()
     model_dict = dict()
     assert len(dict_to_test) == len(model_dict) == 0
@@ -53,21 +93,11 @@ def validate_iterators(dict_to_test):
 
     dict_to_test.clear()
 
-
-def validate_case_sensitivity(dict_to_test):
-    dict_to_test.clear()
-    model_dict = dict()
-
-    for s in ["aaAA", "AAaa", "AAAA", "aaaa", "aAaA", "aAaa"]:
-        dict_to_test[s] = s + s
-        model_dict[s] = s + s
-        assert len(dict_to_test) == len(model_dict)
-        assert dict_to_test[s] == model_dict[s]
-
-    dict_to_test.clear()
-
-def validate_complex_keys(dict_to_test):
+@pytest.mark.parametrize("DictToTest, kwargs", mutable_tests)
+@mock_s3
+def test_complex_keys(tmpdir, DictToTest, kwargs):
     """Test if compound keys work correctly."""
+    dict_to_test = DictToTest(dir_name=tmpdir, **kwargs)
     dict_to_test.clear()
     model_dict = dict()
 
@@ -79,8 +109,11 @@ def validate_complex_keys(dict_to_test):
 
     dict_to_test.clear()
 
-def validate_subdicts(dict_to_test):
+@pytest.mark.parametrize("DictToTest, kwargs", mutable_tests)
+@mock_s3
+def test_subdicts(tmpdir, DictToTest, kwargs):
     """Test if get_subdict() works correctly."""
+    dict_to_test = DictToTest(dir_name=tmpdir, **kwargs)
     dict_to_test.clear()
     model_dict = dict()
 
@@ -94,7 +127,10 @@ def validate_subdicts(dict_to_test):
     assert len(fdd.get_subdict("a")) == 0
     assert len(fdd.get_subdict("b")) == 0
 
-def validate_work_with_basic_datatypes(dict_to_test):
+
+@pytest.mark.parametrize("DictToTest, kwargs", mutable_tests)
+@mock_s3
+def test_work_with_basic_datatypes(tmpdir, DictToTest, kwargs):
     sample_data = [ [1,2,3,4,5]
                     ,["a","b","c","d","e"]
                     ,[i*i/3.14 for i in range(55)]
@@ -105,6 +141,7 @@ def validate_work_with_basic_datatypes(dict_to_test):
                     ,True
                     ,(1,2,3,4,5,(6,7,8,9,10,(11,12,13,14,15)))
                     ]
+    dict_to_test = DictToTest(dir_name=tmpdir, **kwargs)
     dict_to_test.clear()
     model_dict = dict()
     for i,d in enumerate(sample_data):
@@ -117,8 +154,11 @@ def validate_work_with_basic_datatypes(dict_to_test):
 
     dict_to_test.clear()
 
-def validate_work_with_pandas(dict_to_test):
+@pytest.mark.parametrize("DictToTest, kwargs", mutable_tests)
+@mock_s3
+def test_work_with_pandas(tmpdir, DictToTest, kwargs):
     """Validate how dict_to_test works with various pandas data types."""
+    dict_to_test = DictToTest(dir_name=tmpdir, **kwargs)
     dict_to_test.clear()
     model_dict = dict()
 
@@ -142,7 +182,10 @@ def validate_work_with_pandas(dict_to_test):
 
     dict_to_test.clear()
 
-def validate_more_dict_methods(dict_to_test):
+@pytest.mark.parametrize("DictToTest, kwargs", mutable_tests)
+@mock_s3
+def test_more_dict_methods(tmpdir, DictToTest, kwargs):
+    dict_to_test = DictToTest(dir_name=tmpdir, **kwargs)
     dict_to_test.clear()
     model_dict = dict()
 
@@ -181,16 +224,4 @@ def validate_more_dict_methods(dict_to_test):
     for v in model_dict:
         assert v in dict_to_test
 
-    dict_to_test.clear()
-
-
-def validate_dict_object(dict_to_test):
-    validate_basics(dict_to_test)
-    validate_case_sensitivity(dict_to_test)
-    validate_iterators(dict_to_test)
-    validate_complex_keys(dict_to_test)
-    validate_subdicts(dict_to_test)
-    validate_work_with_basic_datatypes(dict_to_test)
-    validate_work_with_pandas(dict_to_test)
-    validate_more_dict_methods(dict_to_test)
     dict_to_test.clear()
