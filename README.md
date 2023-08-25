@@ -91,11 +91,11 @@ in an AWS S3 bucket.
 * You can use square brackets to get, set, or delete values. 
 * You can iterate over keys, values, or items. 
 * You can check if a key is in the dictionary. 
-* You can check whether two dicts are equal.
+* You can check whether two dicts are equal
 (meaning they contain the same key-value pairs).
 * You can get the length of the dictionary.
 * Methods `keys()`, `values()`, `items()`, `get()`, `clear()`
-, `clear()`, `setdefault()`, `update()` etc. work as expected.
+, `setdefault()`, `update()` etc. work as expected.
 
 ## Key Differences From Python Built-in Dictionaries
 
