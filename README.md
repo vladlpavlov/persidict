@@ -27,28 +27,26 @@ Once created, it can be used as a regular Python dictionary:
     my_dictionary["Eliza","year"] = 1965
     my_dictionary["Eliza","authors"] = ["Joseph Weizenbaum"]
     
-    my_dictionary["Shoebox"] = ("IBM Shoebox performed arithmetic on voice command.")
+    my_dictionary["Shoebox"] = "IBM Shoebox performed arithmetic on voice command."
     my_dictionary["Shoebox", "year"] = 1961
     my_dictionary["Shoebox", "authors"] = ["W.C. Dersch", "E.A. Quade"]
 
     for k in my_dictionary:
-        print(list(k), "==",  my_dictionary[k])
+        print(list(k), "==>",  my_dictionary[k])
 
     assert "Eliza" in my_dictionary, "Something is wrong"
 
 If you run the code above, it will produce the following output:
 
-    >>> ['Eliza'] == MIT Eliza was a mock psychotherapist.
-    >>> ['Shoebox'] == IBM Shoebox performed arithmetic on voice command.
-    >>> ['Shoebox', 'authors'] == ['W.C. Dersch', 'E.A. Quade']
-    >>> ['Shoebox', 'year'] == 1961
-    >>> ['Eliza', 'authors'] == ['Joseph Weizenbaum']
-    >>> ['Eliza', 'year'] == 1965
-
+    >>> ['Eliza'] ==> MIT Eliza was a mock psychotherapist.
+    >>> ['Shoebox'] ==> IBM Shoebox performed arithmetic on voice command.
+    >>> ['Shoebox', 'authors'] ==> ['W.C. Dersch', 'E.A. Quade']
+    >>> ['Shoebox', 'year'] ==> 1961
+    >>> ['Eliza', 'authors'] ==> ['Joseph Weizenbaum']
+    >>> ['Eliza', 'year'] ==> 1965
 
 Persistent dictionaries only accept sequences 
-of URL/filename-safe non-empty strings as keys. 
-Any pickleable Python object can be used as a value. 
+of strings as keys. Any pickleable Python object can be used as a value. 
 Unlike regular Python dictionaries, insertion order is not preserved.
 
     del my_dictionary
@@ -59,7 +57,7 @@ The code above will print
 
     >>> len(new_dict) == 6
 
-because the data was stored on a disk.
+because the dictionary was stored on a disk.
 
 Technically, FileDirDict saves its content in a folder on a local disk. 
 But you can share this folder with other machines 
