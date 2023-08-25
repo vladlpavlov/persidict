@@ -9,7 +9,7 @@ It saves the content of the dictionary in a folder on a disk
 or in an S3 bucket on AWS. Each value is stored as a separate file / S3 object.
 Only text strings, or sequences of strings, are allowed as keys.
 
-Unlike other Python persistent dictionaries (e.g. Python's native `shelve`), 
+Unlike other persistent dictionaries (e.g. Python's native `shelve`), 
 `persidict` is suitable for work in highly **distributed environments**, 
 where multiple instances of a program run in parallel on 
 a large number of different machines.
@@ -50,16 +50,17 @@ of strings as keys. Any pickleable Python object can be used as a value.
 Unlike regular Python dictionaries, insertion order is not preserved.
 
     del my_dictionary
-    new_dict = FileDirDict(dir_name= "my_folder")
+    new_dict = FileDirDict(dir_name="my_folder")
     print("len(new_dict) == ",len(new_dict))
 
-The code above will print 
+The code above will create a new object named new_dict and then 
+print its length: 
 
     >>> len(new_dict) == 6
 
-because the dictionary was stored on a disk.
+The length is 6, because the dictionary was already stored on a disk.
 
-Technically, FileDirDict saves its content in a folder on a local disk. 
+Technically, `FileDirDict` saves its content in a folder on a local disk. 
 But you can share this folder with other machines 
 (for example, using Dropbox or NFS), and work with the same dictionary 
 simultaneously from multiple computers (from multiple instances of your program). 
@@ -67,7 +68,7 @@ This approach would allow you to use a persistent dictionary in
 a system that is distributed over dozens or hundreds of computers.
 
 If you need to run your program on thousands (or more) computers, 
-class 'S3Dict' is a better choice: it's a persistent dictionary that 
+class `S3Dict` is a better choice: it's a persistent dictionary that 
 stores its content in an AWS S3 bucket.
 
     from persidict import S3Dict
@@ -109,6 +110,25 @@ of a dictionary.
 * You can not assign initial key-value pairs to a dictionary in its constructor.
 * Methods `quiet_delete()`, `mtimestamp()`, `get_subdict()` and `subdicts()` 
 are available
+
+## Fine Tuning
+
+`PersiDict` subclasses have a number of parameters that can be used 
+to impact behaviour of a dictionary. 
+
+* `file_type` - a string that specifies the type of files used to store objects.
+Possible values are "json" and "pkl". Default value is "pkl".
+* `immutable_items` - a boolean that specifies whether items in a dictionary 
+can be modified/deleted. It enables various distributed cache optimizations 
+for remote storage. True means an append-only dictionary. 
+False means normal dict-like behaviour. The default value is False. 
+* `digest_len` - a length of a hash signature suffix which `persidict` 
+automatically adds to each string in a key while mapping the key to 
+the address of a value in a persistent storage backend 
+(e.g. a filename or an S3 objectname). It is needed to ensure correct work
+of persistent dictionaries with case-insensitive (even if case-preserving) 
+filesystems, such as MacOS HFS. The default value is 8. 
+
 
 ## How To Get It?
 
