@@ -47,11 +47,14 @@ If you run the code above, it will produce the following output:
     >>> ['Eliza', 'authors'] ==> ['Joseph Weizenbaum']
     >>> ['Eliza', 'year'] ==> 1965
 
-Behind the scenes, the dictionary will create a folder named "my_folder".
-Each key-value pair will be stored in a separate pickle file in this folder.
-If the key is a string, the string will be used to create a filename for the object.
-If the key is a sequence of strings, all but the last strings in the sequence 
-will be used to create a name for a sub-folder in the main folder; 
+Behind the scenes, the dictionary will create a folder named "my_folder" 
+on a local disc. Each key-value pair will be stored in a separate pickle file 
+in this folder. 
+
+If the key is a string, the string will be used to create 
+a filename for the object. If the key is a sequence of strings, 
+all but the last strings in the sequence will be used to create a name 
+for a sub-folder in the main folder; 
 the last string will be used to create a filename for the object 
 which will be placed in the sub-folder.
 
@@ -128,7 +131,8 @@ are available
 to impact behaviour of a dictionary. 
 
 * `file_type` - a string that specifies the type of files used to store objects.
-Possible values are "json" and "pkl". Default value is "pkl".
+Possible values are "json" and "pkl". Default value is "pkl". 
+Storing objects as JSON files is mostly supported for debugging purposes.
 * `immutable_items` - a boolean that specifies whether items in a dictionary 
 can be modified/deleted. It enables various distributed cache optimizations 
 for remote storage. True means an append-only dictionary. 
