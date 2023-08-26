@@ -19,7 +19,7 @@ import jsonpickle.ext.pandas as jsonpickle_pandas
 
 from .safe_str_tuple import SafeStrTuple
 from .safe_str_tuple_signing import sign_safe_str_tuple, unsign_safe_str_tuple
-from .persi_dict import PersiDict
+from .persi_dict import PersiDict, PersiDictKey
 
 jsonpickle_numpy.register_handlers()
 jsonpickle_pandas.register_handlers()
@@ -128,7 +128,7 @@ class FileDirDict(PersiDict):
             return os.path.join(*dir_names)
 
 
-    def get_subdict(self, key:SafeStrTuple):
+    def get_subdict(self, key:PersiDictKey):
         """Get a subdictionary containing items with the same prefix_key.
 
         This method is absent in the original dict API.
@@ -166,13 +166,13 @@ class FileDirDict(PersiDict):
         else:
             raise ValueError("file_type must be either pkl or json")
 
-    def __contains__(self, key:SafeStrTuple) -> bool:
+    def __contains__(self, key:PersiDictKey) -> bool:
         """True if the dictionary has the specified key, else False. """
         key = SafeStrTuple(key)
         filename = self._build_full_path(key)
         return os.path.isfile(filename)
 
-    def __getitem__(self, key:SafeStrTuple) -> Any:
+    def __getitem__(self, key:PersiDictKey) -> Any:
         """ Implementation for x[y] syntax. """
         key = SafeStrTuple(key)
         filename = self._build_full_path(key)
@@ -181,7 +181,7 @@ class FileDirDict(PersiDict):
         result = self._read_from_file(filename)
         return result
 
-    def __setitem__(self, key:SafeStrTuple, value:Any):
+    def __setitem__(self, key:PersiDictKey, value:Any):
         """Set self[key] to value."""
         key = SafeStrTuple(key)
         filename = self._build_full_path(key, create_subdirs=True)
@@ -190,7 +190,7 @@ class FileDirDict(PersiDict):
                 "Can't modify an immutable item")
         self._save_to_file(filename, value)
 
-    def __delitem__(self, key:SafeStrTuple) -> None:
+    def __delitem__(self, key:PersiDictKey) -> None:
         """Delete self[key]."""
         key = SafeStrTuple(key)
         assert not self.immutable_items, "Can't delete immutable items"
@@ -240,10 +240,11 @@ class FileDirDict(PersiDict):
         return step()
 
 
-    def mtimestamp(self, key:SafeStrTuple) -> float:
+    def mtimestamp(self, key:PersiDictKey) -> float:
         """Get last modification time (in seconds, Unix epoch time).
 
         This method is absent in the original dict API.
         """
+        key = SafeStrTuple(key)
         filename = self._build_full_path(key)
         return os.path.getmtime(filename)

@@ -8,7 +8,7 @@ import boto3
 from .safe_str_tuple import SafeStrTuple
 from .safe_str_tuple_signing import sign_safe_str_tuple, unsign_safe_str_tuple
 from .persi_dict import PersiDict
-from .file_dir_dict import FileDirDict
+from .file_dir_dict import FileDirDict, PersiDictKey
 
 
 class S3Dict(PersiDict):
@@ -88,16 +88,17 @@ class S3Dict(PersiDict):
         return repr_str
 
 
-    def _build_full_objectname(self, key:SafeStrTuple) -> str:
-        """ Convert SafeStrTuple into an S3 objectname. """
-
+    def _build_full_objectname(self, key:PersiDictKey) -> str:
+        """ Convert PersiDictKey into an S3 objectname. """
+        key = SafeStrTuple(key)
         key = sign_safe_str_tuple(key, self.digest_len)
         objectname = self.root_prefix +  "/".join(key)+ "." + self.file_type
         return objectname
 
 
-    def __contains__(self, key:SafeStrTuple) -> bool:
+    def __contains__(self, key:PersiDictKey) -> bool:
         """True if the dictionary has the specified key, else False. """
+        key = SafeStrTuple(key)
         if self.immutable_items:
             file_name = self.local_cache._build_full_path(
                 key, create_subdirs=True)
@@ -111,9 +112,10 @@ class S3Dict(PersiDict):
             return False
 
 
-    def __getitem__(self, key:SafeStrTuple) -> Any:
+    def __getitem__(self, key:PersiDictKey) -> Any:
         """X.__getitem__(y) is an equivalent to X[y]. """
 
+        key = SafeStrTuple(key)
         file_name = self.local_cache._build_full_path(key, create_subdirs=True)
 
         if self.immutable_items:
@@ -132,9 +134,10 @@ class S3Dict(PersiDict):
         return result
 
 
-    def __setitem__(self, key:SafeStrTuple, value:Any):
+    def __setitem__(self, key:PersiDictKey, value:Any):
         """Set self[key] to value. """
 
+        key = SafeStrTuple(key)
         file_name = self.local_cache._build_full_path(key, create_subdirs=True)
         obj_name = self._build_full_objectname(key)
 
@@ -158,9 +161,10 @@ class S3Dict(PersiDict):
             os.remove(file_name)
 
 
-    def __delitem__(self, key:SafeStrTuple):
+    def __delitem__(self, key:PersiDictKey):
         """Delete self[key]. """
 
+        key = SafeStrTuple(key)
         assert not self.immutable_items, "Can't delete an immutable item"
         obj_name = self._build_full_objectname(key)
         self.s3_client.delete_object(Bucket = self.bucket_name, Key = obj_name)
@@ -225,11 +229,13 @@ class S3Dict(PersiDict):
         return step()
 
 
-    def get_subdict(self, key:SafeStrTuple) -> S3Dict:
+    def get_subdict(self, key:PersiDictKey) -> S3Dict:
         """Get a subdictionary containing items with the same prefix_key.
 
         This method is absent in the original dict API.
         """
+
+        key = SafeStrTuple(key)
         if len(key):
             key = SafeStrTuple(key)
             key = sign_safe_str_tuple(key, self.digest_len)
@@ -249,12 +255,13 @@ class S3Dict(PersiDict):
             , immutable_items = self.immutable_items)
 
 
-    def mtimestamp(self,key:SafeStrTuple) -> float:
+    def mtimestamp(self,key:PersiDictKey) -> float:
         """Get last modification time (in seconds, Unix epoch time).
 
         This method is absent in the original dict API.
         """
         #TODO: check work with timezones
+        key = SafeStrTuple(key)
         obj_name = self._build_full_objectname(key)
         response = self.s3_client.head_object(Bucket=self.bucket_name, Key=obj_name)
         return response["LastModified"].timestamp()

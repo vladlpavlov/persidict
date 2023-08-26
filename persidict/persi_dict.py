@@ -17,10 +17,17 @@ even after the Python process that created the dictionary has terminated.
 from __future__ import annotations
 
 from abc import abstractmethod
-from typing import Any, Dict
+from typing import Any, Dict, Union, Sequence
 from collections.abc import MutableMapping
 
 from .safe_str_tuple import SafeStrTuple
+
+PersiDictKey = Union[SafeStrTuple, str, Sequence[str]]
+""" A value which can be used as a key for PersiDict. 
+
+PersiDictKey must be a string or a sequence of strings.
+The characters within strings must be to URL/filename-safe.
+"""
 
 class PersiDict(MutableMapping):
     """Dict-like durable store that accepts sequences of strings as keys.
@@ -83,25 +90,25 @@ class PersiDict(MutableMapping):
 
 
     @abstractmethod
-    def __contains__(self, key:SafeStrTuple) -> bool:
+    def __contains__(self, key:PersiDictKey) -> bool:
         """True if the dictionary has the specified key, else False."""
         raise NotImplementedError
 
 
     @abstractmethod
-    def __getitem__(self, key:SafeStrTuple) -> Any:
+    def __getitem__(self, key:PersiDictKey) -> Any:
         """X.__getitem__(y) is an equivalent to X[y]"""
         raise NotImplementedError
 
 
-    def __setitem__(self, key:SafeStrTuple, value:Any):
+    def __setitem__(self, key:PersiDictKey, value:Any):
         """Set self[key] to value."""
         if self.immutable_items: # TODO: change to exceptions
             assert key not in self, "Can't modify an immutable key-value pair"
         raise NotImplementedError
 
 
-    def __delitem__(self, key:SafeStrTuple):
+    def __delitem__(self, key:PersiDictKey):
         """Delete self[key]."""
         if self.immutable_items: # TODO: change to exceptions
             assert False, "Can't delete an immutable key-value pair"
@@ -141,12 +148,13 @@ class PersiDict(MutableMapping):
         return self._generic_iter("items")
 
 
-    def setdefault(self, key:SafeStrTuple, default:Any=None) -> Any:
+    def setdefault(self, key:PersiDictKey, default:Any=None) -> Any:
         """Insert key with a value of default if key is not in the dictionary.
 
         Return the value for key if key is in the dictionary, else default.
         """
         # TODO: check age cases to ensure the same semantics as standard dicts
+        key = SafeStrTuple(key)
         if key in self:
             return self[key]
         else:
@@ -173,7 +181,7 @@ class PersiDict(MutableMapping):
 
 
     @abstractmethod
-    def mtimestamp(self, key:SafeStrTuple) -> float:
+    def mtimestamp(self, key:PersiDictKey) -> float:
         """Get last modification time (in seconds, Unix epoch time).
 
         This method is absent in the original dict API.
@@ -187,7 +195,7 @@ class PersiDict(MutableMapping):
             del self[k]
 
 
-    def quiet_delete(self, key:SafeStrTuple):
+    def quiet_delete(self, key:PersiDictKey):
         """ Delete an item without raising an exception if it doesn't exist.
 
         This method is absent in the original dict API, it is added here
@@ -197,13 +205,15 @@ class PersiDict(MutableMapping):
         if self.immutable_items: # TODO: change to exceptions
             assert False, "Can't delete an immutable key-value pair"
 
+        key = SafeStrTuple(key)
+
         try:
             self.__delitem__(key)
         except:
             pass
 
 
-    def get_subdict(self, prefix_key:SafeStrTuple) -> PersiDict:
+    def get_subdict(self, prefix_key:PersiDictKey) -> PersiDict:
         """Get a subdictionary containing items with the same prefix_key.
 
         This method is absent in the original dict API.
