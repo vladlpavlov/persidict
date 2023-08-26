@@ -72,7 +72,7 @@ print its length:
     >>> len(new_dict) == 6
 
 The length is 6, because the dictionary was already stored on a disk 
-(the "my_folder" directory contained 6 pickle files).
+in the "my_folder" directory, which contained 6 pickle files.
 
 Technically, `FileDirDict` saves its content in a folder on a local disk. 
 But you can share this folder with other machines 
