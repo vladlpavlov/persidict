@@ -45,6 +45,14 @@ If you run the code above, it will produce the following output:
     >>> ['Eliza', 'authors'] ==> ['Joseph Weizenbaum']
     >>> ['Eliza', 'year'] ==> 1965
 
+Behind the scenes, the dictionary will create a folder named "my_folder".
+Each key-value pair will be stored in a separate pickle file in this folder.
+If the key is a string, the string will be used to create a filename for the object.
+If the key is a sequence of strings, all but the last strings in the sequence 
+will be used to create a name for a sub-folder in the main folder; 
+the last string will be used to create a filename for the object 
+which will be placed in the sub-folder.
+
 Persistent dictionaries only accept sequences 
 of strings as keys. Any pickleable Python object can be used as a value. 
 Unlike regular Python dictionaries, insertion order is not preserved.
@@ -53,12 +61,13 @@ Unlike regular Python dictionaries, insertion order is not preserved.
     new_dict = FileDirDict(dir_name="my_folder")
     print("len(new_dict) == ",len(new_dict))
 
-The code above will create a new object named new_dict and then 
+The code above will create a new object named new_dict and then will
 print its length: 
 
     >>> len(new_dict) == 6
 
-The length is 6, because the dictionary was already stored on a disk.
+The length is 6, because the dictionary was already stored on a disk 
+(the "my_folder" directory contained 6 pickle files).
 
 Technically, `FileDirDict` saves its content in a folder on a local disk. 
 But you can share this folder with other machines 
