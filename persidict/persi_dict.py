@@ -202,11 +202,12 @@ class PersiDict(MutableMapping):
             del self[k]
 
 
-    def quiet_delete(self, key:PersiDictKey):
+    def delete_if_exists(self, key:PersiDictKey) -> bool:
         """ Delete an item without raising an exception if it doesn't exist.
 
-        This method is absent in the original dict API, it is added here
-        to minimize network calls for (remote) persistent dictionaries.
+        Returns True if the item existed and was deleted, False otherwise.
+
+        This method is absent in the original dict API.
         """
 
         if self.immutable_items: # TODO: change to exceptions
@@ -216,19 +217,20 @@ class PersiDict(MutableMapping):
 
         try:
             self.__delitem__(key)
+            return True
         except:
-            pass
+            return False
 
 
     def get_subdict(self, prefix_key:PersiDictKey) -> PersiDict:
-        """Get a subdictionary containing items with the same prefix_key.
+        """Get a sub-dictionary containing items with the same prefix_key.
 
         This method is absent in the original dict API.
         """
         raise NotImplementedError
 
     def subdicts(self) -> Dict[str, PersiDict]:
-        """Get a dictionary of subdictionaries.
+        """Get a dictionary of sub-dictionaries.
 
         This method is absent in the original dict API.
         """

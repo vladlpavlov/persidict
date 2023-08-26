@@ -122,7 +122,7 @@ that simultaneously work with the same instance of a dictionary.
 * Values must be pickleable Python objects.
 * Insertion order is not preserved.
 * You can not assign initial key-value pairs to a dictionary in its constructor.
-* Methods `quiet_delete()`, `mtimestamp()`, `get_subdict()` and `subdicts()` 
+* Methods `delete_if_exists()`, `mtimestamp()`, `get_subdict()` and `subdicts()` 
 are available
 
 ## Fine Tuning
