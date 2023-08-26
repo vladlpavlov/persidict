@@ -17,6 +17,9 @@ S3_Dict (inherited from PersiDict): a dictionary that
 stores key-value pairs as S3 objects on AWS.
 A key is used to compose an objectname, while a value is stored
 as a pickle or a json S3 object.
+
+The package also offers a helper function get_safe_chars(),
+which returns a set of URL/filename-safe characters permitted in keys.
 """
 
 from .safe_str_tuple import SafeStrTuple, get_safe_chars
