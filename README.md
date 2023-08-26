@@ -27,7 +27,8 @@ Once created, it can be used as a regular Python dictionary:
     my_dictionary["Eliza","year"] = 1965
     my_dictionary["Eliza","authors"] = ["Joseph Weizenbaum"]
     
-    my_dictionary["Shoebox"] = "IBM Shoebox performed arithmetic on voice command."
+    my_dictionary["Shoebox"] = "IBM Shoebox performed arithmetic operations"
+    my_dictionary["Shoebox"] += " on voice commands."
     my_dictionary["Shoebox", "year"] = 1961
     my_dictionary["Shoebox", "authors"] = ["W.C. Dersch", "E.A. Quade"]
 
@@ -39,7 +40,7 @@ Once created, it can be used as a regular Python dictionary:
 If you run the code above, it will produce the following output:
 
     >>> ['Eliza'] ==> MIT Eliza was a mock psychotherapist.
-    >>> ['Shoebox'] ==> IBM Shoebox performed arithmetic on voice command.
+    >>> ['Shoebox'] ==> IBM Shoebox performed arithmetic operations on voice commands.
     >>> ['Shoebox', 'authors'] ==> ['W.C. Dersch', 'E.A. Quade']
     >>> ['Shoebox', 'year'] ==> 1961
     >>> ['Eliza', 'authors'] ==> ['Joseph Weizenbaum']
