@@ -35,7 +35,8 @@ Once created, it can be used as a regular Python dictionary:
     for k in my_dictionary:
         print(list(k), "==>",  my_dictionary[k])
 
-    assert "Eliza" in my_dictionary, "Something is wrong"
+    if not "Eliza" in my_dictionary:
+        print("Something is wrong")
 
 If you run the code above, it will produce the following output:
 
@@ -111,8 +112,8 @@ in an AWS S3 bucket.
 ## Key Differences From Python Built-in Dictionaries
 
 `PersiDict` and its subclasses persist values between program executions, 
-as well as allow simultaneously run programs to work with the same instance 
-of a dictionary.
+as well as make it possible to concurrently run programs 
+that simultaneously work with the same instance of a dictionary.
 
 * Keys must be sequences of URL/filename-safe non-empty strings.
 * Values must be pickleable Python objects.
