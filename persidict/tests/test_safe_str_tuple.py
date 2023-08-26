@@ -1,4 +1,4 @@
-from persidict.safe_str_tuple import SafeStrTuple
+from persidict.safe_str_tuple import SafeStrTuple, get_safe_chars, SAFE_CHARS_SET
 from persidict.safe_str_tuple_signing import sign_safe_str_tuple, unsign_safe_str_tuple
 
 def test_add():
@@ -136,3 +136,7 @@ def test_rejecting_empty_sequences():
         pass
     else:
         assert False, "Failed to reject empty sequence"
+
+def test_get_safe_chars():
+    """Test if get_safe_chars() returns a copy of SAFE_CHARS_SET."""
+    assert get_safe_chars() == SAFE_CHARS_SET

@@ -3,9 +3,14 @@
 
 import string
 from collections.abc import Sequence, Mapping, Hashable
+from copy import deepcopy
 from typing import Tuple, Any
 
 SAFE_CHARS_SET = set(string.ascii_letters + string.digits + "()_-~.=")
+
+def get_safe_chars():
+    """Return a set of allowed characters."""
+    return deepcopy(SAFE_CHARS_SET)
 
 def _is_sequence_not_mapping(obj:Any)->bool:
     """Check if obj is a sequence (e.g. list) but not a mapping (e.g. dict)."""

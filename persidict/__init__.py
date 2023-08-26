@@ -19,7 +19,7 @@ A key is used to compose an objectname, while a value is stored
 as a pickle or a json S3 object.
 """
 
-from .safe_str_tuple import SafeStrTuple
+from .safe_str_tuple import SafeStrTuple, get_safe_chars
 from .persi_dict import PersiDict
 from .file_dir_dict import FileDirDict
 from .s3_dict import S3Dict
