@@ -6,10 +6,14 @@ Python's built-in Dict, with a few variations
 (e.g. insertion order is not preserved) and additional methods.
 
 PersiDict persistently stores key-value pairs.
+
 A key is a sequence of strings in a form of SafeStrTuple.
+Regular strings and their sequences can also be passed to PersiDict as keys,
+in this case they will be automatically converted to SafeStrTuple.
+
 A value can be any Python object.
 
-'Persstently' means that key-value pairs are saved in a durable storage,
+'Persistently' means that key-value pairs are saved in a durable storage,
 such as a local hard-drive or AWS S3 cloud, and can be retrieved
 even after the Python process that created the dictionary has terminated.
 """
@@ -22,11 +26,14 @@ from collections.abc import MutableMapping
 
 from .safe_str_tuple import SafeStrTuple
 
-PersiDictKey = Union[SafeStrTuple, str, Sequence[str]]
+PersiDictKey = Union[SafeStrTuple, Sequence[str], str]
 """ A value which can be used as a key for PersiDict. 
 
-PersiDictKey must be a string or a sequence of strings.
-The characters within strings must be to URL/filename-safe.
+PersiDict-s accept keys on a form ofSafeStrTuple,
+or a string, or a sequence of strings.
+The characters within strings must be URL/filename-safe.
+If a string (or a sequence of strings) is passed to a PersiDict as a key,
+it will be automatically converted to SafeStrTuple.
 """
 
 class PersiDict(MutableMapping):
