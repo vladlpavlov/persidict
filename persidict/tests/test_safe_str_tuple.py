@@ -1,4 +1,5 @@
-from persidict.safe_str_tuple import SafeStrTuple, get_safe_chars, SAFE_CHARS_SET
+from persidict.safe_chars import SAFE_CHARS_SET, get_safe_chars
+from persidict.safe_str_tuple import SafeStrTuple
 from persidict.safe_str_tuple_signing import sign_safe_str_tuple, unsign_safe_str_tuple
 
 def test_add():

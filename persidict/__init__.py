@@ -21,8 +21,8 @@ as a pickle or a json S3 object.
 The package also offers a helper function get_safe_chars(),
 which returns a set of URL/filename-safe characters permitted in keys.
 """
-
-from .safe_str_tuple import SafeStrTuple, get_safe_chars
+from .safe_chars import get_safe_chars
+from .safe_str_tuple import SafeStrTuple
 from .persi_dict import PersiDict
 from .file_dir_dict import FileDirDict
 from .s3_dict import S3Dict
