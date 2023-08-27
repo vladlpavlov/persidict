@@ -29,11 +29,11 @@ from .safe_str_tuple import SafeStrTuple
 PersiDictKey = Union[SafeStrTuple, Sequence[str], str]
 """ A value which can be used as a key for PersiDict. 
 
-PersiDict-s accept keys on a form ofSafeStrTuple,
+PersiDict-s accept keys on a form of SafeStrTuple,
 or a string, or a sequence of strings.
 The characters within strings must be URL/filename-safe.
 If a string (or a sequence of strings) is passed to a PersiDict as a key,
-it will be automatically converted to SafeStrTuple.
+it will be automatically converted into SafeStrTuple.
 """
 
 class PersiDict(MutableMapping):
@@ -215,10 +215,10 @@ class PersiDict(MutableMapping):
 
         key = SafeStrTuple(key)
 
-        try:
-            self.__delitem__(key)
+        if key in self:
+            del self[key]
             return True
-        except:
+        else:
             return False
 
 

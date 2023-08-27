@@ -1,3 +1,5 @@
+import random
+
 import pytest
 from moto import mock_s3
 
@@ -224,4 +226,32 @@ def test_more_dict_methods(tmpdir, DictToTest, kwargs):
     for v in model_dict:
         assert v in dict_to_test
 
+    dict_to_test.clear()
+
+@pytest.mark.parametrize("DictToTest, kwargs", mutable_tests)
+@mock_s3
+def test_delete_if_exists(tmpdir, DictToTest, kwargs, rundom=None):
+    dict_to_test = DictToTest(dir_name=tmpdir, **kwargs)
+    dict_to_test.clear()
+
+    good_keys = []
+    bad_keys = []
+
+    for i in range(1,12):
+        good_k = ("good",)*i
+        bad_k = ("bad",)*i
+        good_keys.append(good_k)
+        bad_keys.append(bad_k)
+        dict_to_test[good_k] = i
+
+
+    num_successful_deletions = 0
+    all_keys = good_keys + bad_keys
+    # print("\n")
+    # print(all_keys)
+    random.shuffle(all_keys)
+    for k in all_keys:
+        num_successful_deletions += dict_to_test.delete_if_exists(k)
+
+    assert num_successful_deletions == len(good_keys)
     dict_to_test.clear()
