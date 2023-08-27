@@ -12,7 +12,7 @@ def get_safe_chars():
     """Return a set of allowed characters."""
     return deepcopy(SAFE_CHARS_SET)
 
-def _is_sequence_not_mapping(obj:Any)->bool:
+def _is_sequence_not_mapping(obj:Any) -> bool:
     """Check if obj is a sequence (e.g. list) but not a mapping (e.g. dict)."""
     if isinstance(obj, Sequence) and not isinstance(obj, Mapping):
         return True
@@ -31,7 +31,7 @@ class SafeStrTuple(Sequence, Hashable):
 
     str_chain: Tuple[str, ...]
 
-    def __init__(self, *args):
+    def __init__(self, *args, **kwargs):
         """Create a SafeStrTuple from a sequence/tree of strings.
 
         The constructor accepts a sequence (list, tuple, etc.) of objects,
@@ -40,6 +40,7 @@ class SafeStrTuple(Sequence, Hashable):
         Each string must be non-empty and contain
         only URL/filename-safe characters.
         """
+        assert len(kwargs) == 0
         assert len(args) > 0
         candidate_str_chain = []
         for a in args:
@@ -68,19 +69,14 @@ class SafeStrTuple(Sequence, Hashable):
         """Return a hash of the tuple."""
         return hash(self.str_chain)
 
-    @classmethod
-    def allowed_characters(cls):
-        """Return a set of allowed characters."""
-        return SAFE_CHARS_SET
-
     def __repr__(self):
         """Return repr(self)."""
-        return f"SafeStrSequence({self.str_chain})"
+        return f"{type(self).__name__}({self.str_chain})"
 
 
     def __eq__(self, other):
         """Return self == other."""
-        assert isinstance(other, SafeStrTuple)
+        other = SafeStrTuple(other)
         return self.str_chain == other.str_chain
 
 
