@@ -182,11 +182,6 @@ class PersiDict(MutableMapping):
             return False
 
 
-    def __ne__(self, other) -> bool:
-        """Return self!=value. """
-        return not (self == other)
-
-
     @abstractmethod
     def mtimestamp(self, key:PersiDictKey) -> float:
         """Get last modification time (in seconds, Unix epoch time).
