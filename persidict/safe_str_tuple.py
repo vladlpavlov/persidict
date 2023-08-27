@@ -76,7 +76,12 @@ class SafeStrTuple(Sequence, Hashable):
 
     def __eq__(self, other):
         """Return self == other."""
-        other = SafeStrTuple(other)
+        if isinstance(other, SafeStrTuple):
+            if type(self).__eq__ != type(other).__eq__:
+                return other.__eq__(self)
+        else:
+            other = SafeStrTuple(other)
+
         return self.str_chain == other.str_chain
 
 

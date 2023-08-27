@@ -140,3 +140,45 @@ def test_rejecting_empty_sequences():
 def test_get_safe_chars():
     """Test if get_safe_chars() returns a copy of SAFE_CHARS_SET."""
     assert get_safe_chars() == SAFE_CHARS_SET
+
+def test_eq_overrideability():
+    class BadTuple(SafeStrTuple):
+        def __eq__(self, other):
+            return False
+
+    class GoodTuple(SafeStrTuple):
+        def __eq__(self, other):
+            return self.str_chain == other.str_chain
+
+    class GoodTuple2(SafeStrTuple):
+        pass
+
+    safe_tuple = SafeStrTuple("a", "b", "c")
+    bad_tuple = BadTuple(safe_tuple)
+    good_tuple = GoodTuple(safe_tuple)
+    good_tuple_2 = GoodTuple2(safe_tuple)
+
+    assert (safe_tuple == bad_tuple) == False
+    assert (bad_tuple == safe_tuple) == False
+    assert (safe_tuple != bad_tuple) == True
+    assert (bad_tuple != safe_tuple) == True
+
+    assert (good_tuple_2 == bad_tuple) == False
+    assert (bad_tuple == good_tuple_2) == False
+    assert (good_tuple_2 != bad_tuple) == True
+    assert (bad_tuple != good_tuple_2) == True
+
+    assert (safe_tuple == good_tuple) == True
+    assert (good_tuple == safe_tuple) == True
+    assert (safe_tuple != good_tuple) == False
+    assert (good_tuple != safe_tuple) == False
+
+    assert (safe_tuple == good_tuple_2) == True
+    assert (good_tuple_2 == safe_tuple) == True
+    assert (safe_tuple != good_tuple_2) == False
+    assert (good_tuple_2 != safe_tuple) == False
+
+    assert (good_tuple == good_tuple_2) == True
+    assert (good_tuple_2 == good_tuple) == True
+    assert (good_tuple != good_tuple_2) == False
+    assert (good_tuple_2 != good_tuple) == False
