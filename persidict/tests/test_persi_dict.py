@@ -247,8 +247,6 @@ def test_delete_if_exists(tmpdir, DictToTest, kwargs, rundom=None):
 
     num_successful_deletions = 0
     all_keys = good_keys + bad_keys
-    # print("\n")
-    # print(all_keys)
     random.shuffle(all_keys)
     for k in all_keys:
         num_successful_deletions += dict_to_test.delete_if_exists(k)

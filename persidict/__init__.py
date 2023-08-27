@@ -18,10 +18,11 @@ stores key-value pairs as S3 objects on AWS.
 A key is used to compose an objectname, while a value is stored
 as a pickle or a json S3 object.
 
-The package also offers a helper function get_safe_chars(),
-which returns a set of URL/filename-safe characters permitted in keys.
+The package also offers two helper functions: get_safe_chars(),
+which returns a set of URL/filename-safe characters permitted in keys,
+and replace_unsafe_chars(), which replaces forbidden characters in a string.
 """
-from .safe_chars import get_safe_chars
+from .safe_chars import get_safe_chars, replace_unsafe_chars
 from .safe_str_tuple import SafeStrTuple
 from .persi_dict import PersiDict
 from .file_dir_dict import FileDirDict
