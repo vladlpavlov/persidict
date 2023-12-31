@@ -27,7 +27,7 @@ def _create_signature_suffix(input_str:str, digest_len:int) -> str:
     input_b = input_str.encode()
     hash_object = hashlib.md5(input_b)
     full_digest_str = base64.b32encode(hash_object.digest()).decode()
-    suffix = "_" + full_digest_str[:digest_len]
+    suffix = "_" + full_digest_str[:digest_len].lower()
 
     return suffix
 
