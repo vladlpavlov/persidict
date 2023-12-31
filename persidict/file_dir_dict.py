@@ -9,10 +9,9 @@ as a pickle or a json object in the file.
 from __future__ import annotations
 
 import os
-import pickle
 from typing import Any
 
-
+import joblib
 import jsonpickle
 import jsonpickle.ext.numpy as jsonpickle_numpy
 import jsonpickle.ext.pandas as jsonpickle_pandas
@@ -39,7 +38,7 @@ class FileDirDict(PersiDict):
 
     def __init__(self
                  , dir_name: str = "FileDirDict"
-                 , file_type: str = "pkl"
+                 , file_type: str = "lz4"
                  , immutable_items:bool = False
                  , digest_len:int = 8):
         """A constructor defines location of the store and file format to use.
@@ -47,7 +46,7 @@ class FileDirDict(PersiDict):
         dir_name is a directory that will contain all the files in
         the FileDirDict. If the directory does not exist, it will be created.
 
-        file_type can take one of two values: "pkl" or "json".
+        file_type can take one of two values: "lz4" or "json".
         It defines which file format will be used by FileDirDict
         to store values.
         """
@@ -57,8 +56,8 @@ class FileDirDict(PersiDict):
 
         self.file_type = file_type
 
-        assert file_type in {"json", "pkl"}, (
-            "file_type must be either pkl or json")
+        assert file_type in {"json", "lz4"}, (
+            "file_type must be either lz4 or json")
         assert not os.path.isfile(dir_name)
         if not os.path.isdir(dir_name):
             os.mkdir(dir_name)
@@ -144,27 +143,27 @@ class FileDirDict(PersiDict):
     def _read_from_file(self, file_name:str) -> Any:
         """Read a value from a file. """
 
-        if self.file_type == "pkl":
+        if self.file_type == "lz4":
             with open(file_name, 'rb') as f:
-                result = pickle.load(f)
+                result = joblib.load(f)
         elif self.file_type == "json":
             with open(file_name, 'r') as f:
                 result = jsonpickle.loads(f.read())
         else:
-            raise ValueError("file_type must be either pkl or json")
+            raise ValueError("file_type must be either lz4 or json")
         return result
 
     def _save_to_file(self, file_name:str, value:Any) -> None:
         """Save a value to a file. """
 
-        if self.file_type == "pkl":
+        if self.file_type == "lz4":
             with open(file_name, 'wb') as f:
-                pickle.dump(value, f)
+                joblib.dump(value, f, compress='lz4')
         elif self.file_type == "json":
             with open(file_name, 'w') as f:
                 f.write(jsonpickle.dumps(value, indent=4))
         else:
-            raise ValueError("file_type must be either pkl or json")
+            raise ValueError("file_type must be either lz4 or json")
 
     def __contains__(self, key:PersiDictKey) -> bool:
         """True if the dictionary has the specified key, else False. """

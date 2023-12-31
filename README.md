@@ -122,8 +122,8 @@ that simultaneously work with the same instance of a dictionary.
 * Values must be pickleable Python objects.
 * Insertion order is not preserved.
 * You can not assign initial key-value pairs to a dictionary in its constructor.
-* Methods `delete_if_exists()`, `mtimestamp()`, `get_subdict()` and `subdicts()` 
-are available
+* `PersiDict` API has methods = `delete_if_exists()`, `mtimestamp()`,
+`get_subdict()` and `subdicts()` , which are not available in Python dicts.
 
 ## Fine Tuning
 
@@ -131,13 +131,13 @@ are available
 to impact behaviour of a dictionary. 
 
 * `file_type` - a string that specifies the type of files used to store objects.
-Possible values are "json" and "pkl". Default value is "pkl". 
+Possible values are "json" and "lz4". Default value is "lz4". 
 Storing objects as JSON files is mostly supported for debugging purposes.
 * `immutable_items` - a boolean that specifies whether items in a dictionary 
 can be modified/deleted. It enables various distributed cache optimizations 
 for remote storage. True means an append-only dictionary. 
 False means normal dict-like behaviour. The default value is False. 
-* `digest_len` - a length of a hash signature suffix which `persidict` 
+* `digest_len` - a length of a hash signature suffix which `PersiDict` 
 automatically adds to each string in a key while mapping the key to 
 the address of a value in a persistent storage backend 
 (e.g. a filename or an S3 objectname). It is needed to ensure correct work
@@ -158,6 +158,7 @@ Binary installers for the latest released version are available at the Python pa
 ## Dependencies
 
 * [jsonpickle](https://jsonpickle.github.io)
+* [joblib](https://joblib.readthedocs.io)
 * [pandas](https://pandas.pydata.org)
 * [numpy](https://numpy.org)
 * [boto3](https://boto3.readthedocs.io)
