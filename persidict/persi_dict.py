@@ -21,6 +21,7 @@ even after the Python process that created the dictionary has terminated.
 from __future__ import annotations
 
 from abc import abstractmethod
+import random
 from typing import Any, Dict, Union, Sequence
 from collections.abc import MutableMapping
 
@@ -195,6 +196,15 @@ class PersiDict(MutableMapping):
         """Remove all items from the dictionary. """
         for k in self.keys():
             del self[k]
+
+
+    def random_keys(self, max_n:int):
+        """Return a list of random keys from the dictionary."""
+        all_keys = list(self.keys())
+        if max_n > len(all_keys):
+            max_n = len(all_keys)
+        result = random.sample(all_keys, max_n)
+        return result
 
 
     def delete_if_exists(self, key:PersiDictKey) -> bool:

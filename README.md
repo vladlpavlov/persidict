@@ -48,7 +48,7 @@ If you run the code above, it will produce the following output:
     >>> ['Eliza', 'year'] ==> 1965
 
 Behind the scenes, the dictionary will create a folder named "my_folder" 
-on a local disk. Each key-value pair will be stored in a separate pickle file 
+on a local disk. Each key-value pair will be stored as a separate file 
 in this folder. 
 
 If the key is a string, the string will be used to create 

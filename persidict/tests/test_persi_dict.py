@@ -253,3 +253,25 @@ def test_delete_if_exists(tmpdir, DictToTest, kwargs, rundom=None):
 
     assert num_successful_deletions == len(good_keys)
     dict_to_test.clear()
+
+
+@pytest.mark.parametrize("DictToTest, kwargs", mutable_tests)
+@mock_s3
+def test_random_keys(tmpdir, DictToTest, kwargs):
+    dict_to_test = DictToTest(dir_name = tmpdir, **kwargs)
+    for n in range(10):
+        dict_to_test[str(n)] = n**2
+        dict_len = len(dict_to_test)
+        for i in range(dict_len+1):
+            assert len(dict_to_test.random_keys(max_n=i)) == i
+        for i in range(dict_len+1, 10):
+            assert len(dict_to_test.random_keys(max_n=i)) == dict_len
+
+    for q in range(1,6):
+        all_keys = set()
+        for n in range(50):
+            single_random_key = dict_to_test.random_keys(max_n=q)[0]
+            all_keys |= {single_random_key}
+        assert len(all_keys) >= 7
+
+
