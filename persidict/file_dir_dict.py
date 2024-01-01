@@ -52,7 +52,7 @@ class FileDirDict(PersiDict):
         """
 
         super().__init__(immutable_items = immutable_items
-                ,digetst_len = digest_len)
+                ,digest_len = digest_len)
 
         self.file_type = file_type
 
