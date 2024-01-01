@@ -11,7 +11,7 @@ A key is a sequence of strings in a form of SafeStrTuple.
 Regular strings and their sequences can also be passed to PersiDict as keys,
 in this case they will be automatically converted to SafeStrTuple.
 
-A value can be any Python object.
+A value can be (virtually) any Python object.
 
 'Persistently' means that key-value pairs are saved in a durable storage,
 such as a local hard-drive or AWS S3 cloud, and can be retrieved
@@ -199,7 +199,10 @@ class PersiDict(MutableMapping):
 
 
     def random_keys(self, max_n:int):
-        """Return a list of random keys from the dictionary."""
+        """Return a list of random keys from the dictionary.
+
+        This method is absent in the original dict API.
+        """
         all_keys = list(self.keys())
         if max_n > len(all_keys):
             max_n = len(all_keys)

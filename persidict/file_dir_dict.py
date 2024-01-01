@@ -4,7 +4,7 @@ This functionality is implemented by the class FileDirDict
 (inherited from PersiDict): a dictionary that
 stores key-value pairs as files on a local hard-drive.
 A key is used to compose a filename, while a value is stored
-as a pickle or a json object in the file.
+as a binary or a json object in the file.
 """
 from __future__ import annotations
 
@@ -32,8 +32,8 @@ class FileDirDict(PersiDict):
     A value can be any Python object, which is stored in a file.
     Insertion order is not preserved.
 
-    FileDirDict can store objects in binary files (as pickles)
-    or in human-readable text files (using jsonpickles).
+    FileDirDict can store objects in binary files or in human-readable
+    text files (using jsonpickles).
     """
 
     def __init__(self

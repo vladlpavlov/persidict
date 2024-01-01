@@ -122,8 +122,9 @@ that simultaneously work with the same instance of a dictionary.
 * Values must be pickleable Python objects.
 * Insertion order is not preserved.
 * You can not assign initial key-value pairs to a dictionary in its constructor.
-* `PersiDict` API has methods = `delete_if_exists()`, `mtimestamp()`,
-`get_subdict()` and `subdicts()` , which are not available in Python dicts.
+* `PersiDict` API has additional methods `delete_if_exists()`, `mtimestamp()`,
+`get_subdict()`, random_keys(), and `subdicts()` , which are 
+not available in Python dicts.
 
 ## Fine Tuning
 
