@@ -120,6 +120,7 @@ that simultaneously work with the same instance of a dictionary.
 
 * Keys must be sequences of URL/filename-safe non-empty strings.
 * Values must be pickleable Python objects.
+* You can constrain values to be an instance of a specific class.
 * Insertion order is not preserved.
 * You can not assign initial key-value pairs to a dictionary in its constructor.
 * `PersiDict` API has additional methods `delete_if_exists()`, `mtimestamp()`,
@@ -131,9 +132,18 @@ not available in Python dicts.
 `PersiDict` subclasses have a number of parameters that can be used 
 to impact behaviour of a dictionary. 
 
+* `base_class_for_values` - A base class for values stored in a dictionary.  
+If specified, it will be used to check types of values in the dictionary. 
+If not specified (if set to `None`), no type checking will be performed 
+and all types will be allowed.
 * `file_type` - a string that specifies the type of files used to store objects.
-Possible values are "json" and "lz4". Default value is "lz4". 
-Storing objects as JSON files is mostly supported for debugging purposes.
+If `file_type` has one of two values: "lz4" or "json", it defines 
+which file format will be used by the dictionary to store values. 
+For all other values of `file_type`, the file format will always be plain
+text. "lz4" or "json" allow to store arbitrary Python objects,
+while all other file_type-s only work with str objects; 
+it means `base_class_for_values` must be explicitly set to `str` 
+if `file_type` is not set to "lz4" or "json".
 * `immutable_items` - a boolean that specifies whether items in a dictionary 
 can be modified/deleted. It enables various distributed cache optimizations 
 for remote storage. True means an append-only dictionary. 
@@ -160,6 +170,7 @@ Binary installers for the latest released version are available at the Python pa
 
 * [jsonpickle](https://jsonpickle.github.io)
 * [joblib](https://joblib.readthedocs.io)
+* [lz4](https://python-lz4.readthedocs.io)
 * [pandas](https://pandas.pydata.org)
 * [numpy](https://numpy.org)
 * [boto3](https://boto3.readthedocs.io)

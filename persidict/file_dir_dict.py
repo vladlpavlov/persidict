@@ -3,13 +3,14 @@
 This functionality is implemented by the class FileDirDict
 (inherited from PersiDict): a dictionary that
 stores key-value pairs as files on a local hard-drive.
-A key is used to compose a filename, while a value is stored
-as a binary or a json object in the file.
+A key is used to compose a filename, while a value is stored in the file
+as a binary, or as a json object, or as a plain text
+(depends on configuration parameters).
 """
 from __future__ import annotations
 
 import os
-from typing import Any
+from typing import Any, Optional, Union
 
 import joblib
 import jsonpickle
@@ -33,31 +34,43 @@ class FileDirDict(PersiDict):
     Insertion order is not preserved.
 
     FileDirDict can store objects in binary files or in human-readable
-    text files (using jsonpickles).
+    text files (either in jason format or as a plain text).
     """
 
     def __init__(self
                  , dir_name: str = "FileDirDict"
                  , file_type: str = "lz4"
                  , immutable_items:bool = False
-                 , digest_len:int = 8):
+                 , digest_len:int = 8
+                 , base_class_for_values: Optional[str] = None):
         """A constructor defines location of the store and file format to use.
 
         dir_name is a directory that will contain all the files in
         the FileDirDict. If the directory does not exist, it will be created.
 
-        file_type can take one of two values: "lz4" or "json".
-        It defines which file format will be used by FileDirDict
-        to store values.
+        base_class_for_values constraints the type of values that can be
+        stored in the dictionary. If specified, it will be used to
+        check types of values in the dictionary. If not specified,
+        no type checking will be performed and all types will be allowed.
+
+        file_type is extension, which will be used for all files in the dictionary.
+        If file_type has one of two values: "lz4" or "json", it defines
+        which file format will be used by FileDirDict to store values.
+        For all other values of file_type, the file format will always be plain
+        text. "lz4" or "json" allow to store arbitrary Python objects,
+        while all other file_type-s only work with str objects.
         """
 
         super().__init__(immutable_items = immutable_items
-                ,digest_len = digest_len)
+                ,digest_len = digest_len
+                ,base_class_for_values = base_class_for_values)
 
         self.file_type = file_type
 
-        assert file_type in {"json", "lz4"}, (
-            "file_type must be either lz4 or json")
+        if (base_class_for_values is None or
+                not issubclass(base_class_for_values,str)):
+            assert file_type in {"json", "lz4"}, ("For non-string values "
+                + "file_type must be either lz4 or json")
         assert not os.path.isfile(dir_name)
         if not os.path.isdir(dir_name):
             os.mkdir(dir_name)
@@ -80,10 +93,11 @@ class FileDirDict(PersiDict):
         """ Get number of key-value pairs in the dictionary."""
 
         num_files = 0
+        suffix = "." + self.file_type
         for subdir_info in os.walk(self.base_dir):
             files = subdir_info[2]
             files = [f_name for f_name in files
-                     if f_name.endswith(self.file_type)]
+                     if f_name.endswith(suffix)]
             num_files += len(files)
         return num_files
 
@@ -95,8 +109,9 @@ class FileDirDict(PersiDict):
 
         for subdir_info in os.walk(self.base_dir, topdown=False):
             (subdir_name, _, files) = subdir_info
+            suffix = "." + self.file_type
             for f in files:
-                if f.endswith(self.file_type):
+                if f.endswith(suffix):
                     os.remove(os.path.join(subdir_name, f))
             if (subdir_name != self.base_dir) and (
                     len(os.listdir(subdir_name)) == 0 ):
@@ -149,8 +164,12 @@ class FileDirDict(PersiDict):
         elif self.file_type == "json":
             with open(file_name, 'r') as f:
                 result = jsonpickle.loads(f.read())
+        elif issubclass(self.base_class_for_values, str):
+            with open(file_name, 'r') as f:
+                result = f.read()
         else:
-            raise ValueError("file_type must be either lz4 or json")
+            raise ValueError("When base_class_for_values is not str,"
+                             + " file_type must be either lz4 or json")
         return result
 
     def _save_to_file(self, file_name:str, value:Any) -> None:
@@ -162,8 +181,12 @@ class FileDirDict(PersiDict):
         elif self.file_type == "json":
             with open(file_name, 'w') as f:
                 f.write(jsonpickle.dumps(value, indent=4))
+        elif issubclass(self.base_class_for_values, str):
+            with open(file_name, 'w') as f:
+                f.write(value)
         else:
-            raise ValueError("file_type must be either lz4 or json")
+            raise ValueError("When base_class_for_values is not str,"
+                            + " file_type must be either lz4 or json")
 
     def __contains__(self, key:PersiDictKey) -> bool:
         """True if the dictionary has the specified key, else False. """
@@ -182,6 +205,11 @@ class FileDirDict(PersiDict):
 
     def __setitem__(self, key:PersiDictKey, value:Any):
         """Set self[key] to value."""
+        if self.base_class_for_values is not None:
+            if not isinstance(value, self.base_class_for_values):
+                raise TypeError(
+                    f"Value must be of type {self.base_class_for_values}")
+
         key = SafeStrTuple(key)
         filename = self._build_full_path(key, create_subdirs=True)
         if self.immutable_items:
@@ -218,9 +246,10 @@ class FileDirDict(PersiDict):
             return tuple(result)
 
         def step():
+            suffix = "." + self.file_type
             for dir_name, _, files in walk_results:
                 for f in files:
-                    if f.endswith(self.file_type):
+                    if f.endswith(suffix):
                         prefix_key = os.path.relpath(
                             dir_name, start=self.base_dir)
 

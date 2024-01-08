@@ -22,7 +22,7 @@ from __future__ import annotations
 
 from abc import abstractmethod
 import random
-from typing import Any, Dict, Union, Sequence
+from typing import Any, Dict, Union, Sequence, Optional
 from collections.abc import MutableMapping
 
 from .safe_str_tuple import SafeStrTuple
@@ -42,7 +42,8 @@ class PersiDict(MutableMapping):
 
     An abstract base class for key-value stores. It accepts keys in a form of
     SafeStrSequence - a URL/filename-safe sequence of strings.
-    It imposes no restrictions on types of values in the key-value pairs.
+    It assumes no restrictions on types of values in the key-value pairs,
+    but allows users to impose such restrictions.
 
     The API for the class resembles the API of Python's built-in Dict
     (see https://docs.python.org/3/library/stdtypes.html#mapping-types-dict)
@@ -68,6 +69,12 @@ class PersiDict(MutableMapping):
                  of persistent dictionaries with case-insensitive
                  (even if case-preserving) filesystems, such as MacOS HFS.
 
+    base_class_for_values: Any
+                    A base class for values stored in the dictionary.
+                    If specified, it will be used to check types of values
+                    in the dictionary. If not specified, no type checking
+                    will be performed and all types will be allowed.
+
     """
     # TODO: refactor to support variable length of min_digest_len
     digest_len:int
@@ -76,10 +83,12 @@ class PersiDict(MutableMapping):
     def __init__(self
                  , immutable_items:bool
                  , digest_len:int = 8
+                 , base_class_for_values:Any = None
                  , *args, **kwargas):
         assert digest_len >= 0
         self.digest_len = int(digest_len)
         self.immutable_items = bool(immutable_items)
+        self.base_class_for_values = base_class_for_values
 
 
     def __repr__(self):
@@ -88,6 +97,7 @@ class PersiDict(MutableMapping):
         repr_str += repr(dict(self.items()))
         repr_str += f", immutable_items={self.immutable_items}"
         repr_str += f", digest_len={self.digest_len}"
+        repr_str += f", base_class_for_values={self.base_class_for_values}"
         repr_str += ")"
         return repr_str
 

@@ -35,6 +35,7 @@ class S3Dict(PersiDict):
                  , file_type:str = "pkl"
                  , immutable_items:bool = False
                  , digest_len:int = 8
+                 , base_class_for_values:Any = None
                  ,*args ,**kwargs):
         """A constructor defines location of the store and object format to use.
 
@@ -46,9 +47,17 @@ class S3Dict(PersiDict):
 
         dir_name is a local directory that will be used to store tmp files.
 
-        file_type can take one of two values: "pkl" or "json".
-        It defines which object format will be used by S3_Dict
-        to store values.
+        base_class_for_values constraints the type of values that can be
+        stored in the dictionary. If specified, it will be used to
+        check types of values in the dictionary. If not specified,
+        no type checking will be performed and all types will be allowed.
+
+        file_type is extension, which will be used for all files in the dictionary.
+        If file_type has one of two values: "lz4" or "json", it defines
+        which file format will be used by FileDirDict to store values.
+        For all other values of file_type, the file format will always be plain
+        text. "lz4" or "json" allow to store arbitrary Python objects,
+        while all other file_type-s only work with str objects.
         """
 
         super().__init__(immutable_items = immutable_items, digest_len = 0)
@@ -58,6 +67,7 @@ class S3Dict(PersiDict):
             dir_name = dir_name
             , file_type = file_type
             , immutable_items = immutable_items
+            , base_class_for_values=base_class_for_values
             , digest_len = digest_len)
 
         self.region = region
@@ -136,6 +146,11 @@ class S3Dict(PersiDict):
 
     def __setitem__(self, key:PersiDictKey, value:Any):
         """Set self[key] to value. """
+
+        if self.base_class_for_values is not None:
+            if not isinstance(value, self.base_class_for_values):
+                raise TypeError(
+                    f"Value must be of type {self.base_class_for_values}")
 
         key = SafeStrTuple(key)
         file_name = self.local_cache._build_full_path(key, create_subdirs=True)
