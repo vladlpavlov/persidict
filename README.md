@@ -179,4 +179,4 @@ Binary installers for the latest released version are available at the Python pa
 
 ## Key Contacts
 
-* [Vlad (Volodymyr) Pavlov](https://www.linkedin.com/in/vlpavlov/) - Initial work
+* [Vlad (Volodymyr) Pavlov](https://www.linkedin.com/in/vlpavlov/)

@@ -17,6 +17,7 @@ import jsonpickle
 import jsonpickle.ext.numpy as jsonpickle_numpy
 import jsonpickle.ext.pandas as jsonpickle_pandas
 
+from .safe_chars import replace_unsafe_chars
 from .safe_str_tuple import SafeStrTuple
 from .safe_str_tuple_signing import sign_safe_str_tuple, unsign_safe_str_tuple
 from .persi_dict import PersiDict, PersiDictKey
@@ -42,7 +43,7 @@ class FileDirDict(PersiDict):
                  , file_type: str = "lz4"
                  , immutable_items:bool = False
                  , digest_len:int = 8
-                 , base_class_for_values: Optional[str] = None):
+                 , base_class_for_values: Optional[type] = None):
         """A constructor defines location of the store and file format to use.
 
         dir_name is a directory that will contain all the files in
@@ -65,12 +66,13 @@ class FileDirDict(PersiDict):
                 ,digest_len = digest_len
                 ,base_class_for_values = base_class_for_values)
 
+        assert file_type == replace_unsafe_chars(file_type, "")
         self.file_type = file_type
 
         if (base_class_for_values is None or
                 not issubclass(base_class_for_values,str)):
             assert file_type in {"json", "lz4"}, ("For non-string values "
-                + "file_type must be either lz4 or json")
+                + "file_type must be either 'lz4' or 'json'")
         assert not os.path.isfile(dir_name)
         if not os.path.isdir(dir_name):
             os.mkdir(dir_name)
@@ -186,7 +188,7 @@ class FileDirDict(PersiDict):
                 f.write(value)
         else:
             raise ValueError("When base_class_for_values is not str,"
-                            + " file_type must be either lz4 or json")
+                            + " file_type must be either 'lz4' or 'json'")
 
     def __contains__(self, key:PersiDictKey) -> bool:
         """True if the dictionary has the specified key, else False. """

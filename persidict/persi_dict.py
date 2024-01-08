@@ -69,7 +69,7 @@ class PersiDict(MutableMapping):
                  of persistent dictionaries with case-insensitive
                  (even if case-preserving) filesystems, such as MacOS HFS.
 
-    base_class_for_values: Any
+    base_class_for_values: Optional[type]
                     A base class for values stored in the dictionary.
                     If specified, it will be used to check types of values
                     in the dictionary. If not specified, no type checking
@@ -83,7 +83,7 @@ class PersiDict(MutableMapping):
     def __init__(self
                  , immutable_items:bool
                  , digest_len:int = 8
-                 , base_class_for_values:Any = None
+                 , base_class_for_values:Optional[type] = None
                  , *args, **kwargas):
         assert digest_len >= 0
         self.digest_len = int(digest_len)

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import os
-from typing import Any
+from typing import Any, Optional
 
 import boto3
 
@@ -35,7 +35,7 @@ class S3Dict(PersiDict):
                  , file_type:str = "pkl"
                  , immutable_items:bool = False
                  , digest_len:int = 8
-                 , base_class_for_values:Any = None
+                 , base_class_for_values:Optional[type] = None
                  ,*args ,**kwargs):
         """A constructor defines location of the store and object format to use.
 
