@@ -137,13 +137,13 @@ If specified, it will be used to check types of values in the dictionary.
 If not specified (if set to `None`), no type checking will be performed 
 and all types will be allowed.
 * `file_type` - a string that specifies the type of files used to store objects.
-If `file_type` has one of two values: "lz4" or "json", it defines 
+If `file_type` has one of two values: "pkl" or "json", it defines 
 which file format will be used by the dictionary to store values. 
 For all other values of `file_type`, the file format will always be plain
-text. "lz4" or "json" allow to store arbitrary Python objects,
+text. "pkl" or "json" allow to store arbitrary Python objects,
 while all other file_type-s only work with str objects; 
 it means `base_class_for_values` must be explicitly set to `str` 
-if `file_type` is not set to "lz4" or "json".
+if `file_type` is not set to "pkl" or "json".
 * `immutable_items` - a boolean that specifies whether items in a dictionary 
 can be modified/deleted. It enables various distributed cache optimizations 
 for remote storage. True means an append-only dictionary. 

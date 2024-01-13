@@ -40,7 +40,7 @@ class FileDirDict(PersiDict):
 
     def __init__(self
                  , dir_name: str = "FileDirDict"
-                 , file_type: str = "lz4"
+                 , file_type: str = "pkl"
                  , immutable_items:bool = False
                  , digest_len:int = 8
                  , base_class_for_values: Optional[type] = None):
@@ -55,10 +55,10 @@ class FileDirDict(PersiDict):
         no type checking will be performed and all types will be allowed.
 
         file_type is extension, which will be used for all files in the dictionary.
-        If file_type has one of two values: "lz4" or "json", it defines
+        If file_type has one of two values: "pkl" or "json", it defines
         which file format will be used by FileDirDict to store values.
         For all other values of file_type, the file format will always be plain
-        text. "lz4" or "json" allow to store arbitrary Python objects,
+        text. "pkl" and "json" allow to store arbitrary Python objects,
         while all other file_type-s only work with str objects.
         """
 
@@ -71,8 +71,8 @@ class FileDirDict(PersiDict):
 
         if (base_class_for_values is None or
                 not issubclass(base_class_for_values,str)):
-            assert file_type in {"json", "lz4"}, ("For non-string values "
-                + "file_type must be either 'lz4' or 'json'")
+            assert file_type in {"json", "pkl"}, ("For non-string values"
+                + " file_type must be either 'pkl' or 'json'.")
         assert not os.path.isfile(dir_name)
         if not os.path.isdir(dir_name):
             os.mkdir(dir_name)
@@ -160,7 +160,7 @@ class FileDirDict(PersiDict):
     def _read_from_file(self, file_name:str) -> Any:
         """Read a value from a file. """
 
-        if self.file_type == "lz4":
+        if self.file_type == "pkl":
             with open(file_name, 'rb') as f:
                 result = joblib.load(f)
         elif self.file_type == "json":
@@ -171,13 +171,13 @@ class FileDirDict(PersiDict):
                 result = f.read()
         else:
             raise ValueError("When base_class_for_values is not str,"
-                             + " file_type must be either lz4 or json")
+                + " file_type must be pkl or json.")
         return result
 
     def _save_to_file(self, file_name:str, value:Any) -> None:
         """Save a value to a file. """
 
-        if self.file_type == "lz4":
+        if self.file_type == "pkl":
             with open(file_name, 'wb') as f:
                 joblib.dump(value, f, compress='lz4')
         elif self.file_type == "json":
@@ -188,7 +188,7 @@ class FileDirDict(PersiDict):
                 f.write(value)
         else:
             raise ValueError("When base_class_for_values is not str,"
-                            + " file_type must be either 'lz4' or 'json'")
+                + " file_type must be either 'pkl' or 'json'")
 
     def __contains__(self, key:PersiDictKey) -> bool:
         """True if the dictionary has the specified key, else False. """
