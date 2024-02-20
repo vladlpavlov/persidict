@@ -1,9 +1,8 @@
 """SafeStrTuple: an immutable flat tuple of non-emtpy URL/filename-safe strings.
 """
-
+from __future__ import annotations
 from collections.abc import Sequence, Mapping, Hashable
-from typing import Tuple, Any
-
+from typing import Any
 from persidict.safe_chars import SAFE_CHARS_SET
 
 
@@ -24,7 +23,7 @@ class SafeStrTuple(Sequence, Hashable):
     """An immutable sequence of non-emtpy URL/filename-safe strings.
     """
 
-    str_chain: Tuple[str, ...]
+    str_chain: tuple[str, ...]
 
     def __init__(self, *args, **kwargs):
         """Create a SafeStrTuple from a sequence/tree of strings.
@@ -52,11 +51,11 @@ class SafeStrTuple(Sequence, Hashable):
                 assert False, f"Invalid argument type: {type(a)}"
         self.str_chain = tuple(candidate_str_chain)
 
-    def __getitem__(self, key):
+    def __getitem__(self, key:int)-> str:
         """Return a string at position key."""
         return self.str_chain[key]
 
-    def __len__(self):
+    def __len__(self) -> int:
         """Return the number of strings in the tuple."""
         return len(self.str_chain)
 
@@ -64,12 +63,12 @@ class SafeStrTuple(Sequence, Hashable):
         """Return a hash of the tuple."""
         return hash(self.str_chain)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """Return repr(self)."""
         return f"{type(self).__name__}({self.str_chain})"
 
 
-    def __eq__(self, other):
+    def __eq__(self, other) -> bool:
         """Return self == other."""
         if isinstance(other, SafeStrTuple):
             if type(self).__eq__ != type(other).__eq__:
@@ -80,12 +79,12 @@ class SafeStrTuple(Sequence, Hashable):
         return self.str_chain == other.str_chain
 
 
-    def __add__(self, other):
+    def __add__(self, other) -> SafeStrTuple:
         """Return self + other."""
         other = SafeStrTuple(other)
         return SafeStrTuple(*(self.str_chain + other.str_chain))
 
-    def __radd__(self, other):
+    def __radd__(self, other) -> SafeStrTuple:
         """Return other + self."""
         other = SafeStrTuple(other)
         return SafeStrTuple(*(other.str_chain + self.str_chain))
@@ -94,10 +93,10 @@ class SafeStrTuple(Sequence, Hashable):
         """Return iter(self)."""
         return iter(self.str_chain)
 
-    def __contains__(self, item):
+    def __contains__(self, item) -> bool:
         """Return item in self."""
         return item in self.str_chain
 
-    def __reversed__(self):
+    def __reversed__(self) -> SafeStrTuple:
         """Return a reversed SafeStrTuple."""
         return SafeStrTuple(*reversed(self.str_chain))

@@ -5,7 +5,7 @@ with open("README.md", "r") as f:
 
 setuptools.setup(
     name="persidict"
-    ,version="0.6.0"
+    ,version="0.7.0"
     ,author="Vlad (Volodymyr) Pavlov"
     ,author_email="vlpavlov@ieee.org"
     ,description= "Simple persistent key-value store for Python. " 
@@ -26,7 +26,7 @@ setuptools.setup(
         , "Topic :: Software Development :: Libraries :: Python Modules"
     ]
     ,keywords='persistence, dicts, distributed, parallel'
-    ,python_requires='>=3.8'
+    ,python_requires='>=3.10'
     ,install_requires=[
         'lz4'
         , 'joblib'

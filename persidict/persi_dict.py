@@ -22,12 +22,12 @@ from __future__ import annotations
 
 from abc import abstractmethod
 import random
-from typing import Any, Dict, Union, Sequence, Optional
+from typing import Any, Sequence, Optional
 from collections.abc import MutableMapping
 
 from .safe_str_tuple import SafeStrTuple
 
-PersiDictKey = Union[SafeStrTuple, Sequence[str], str]
+PersiDictKey = SafeStrTuple | Sequence[str] | str
 """ A value which can be used as a key for PersiDict. 
 
 PersiDict-s accept keys on a form of SafeStrTuple,
@@ -79,6 +79,7 @@ class PersiDict(MutableMapping):
     # TODO: refactor to support variable length of min_digest_len
     digest_len:int
     immutable_items:bool
+    base_class_for_values:type
 
     def __init__(self
                  , immutable_items:bool
@@ -91,7 +92,7 @@ class PersiDict(MutableMapping):
         self.base_class_for_values = base_class_for_values
 
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """Return repr(self)"""
         repr_str = self.__class__.__name__ + "("
         repr_str += repr(dict(self.items()))
@@ -102,7 +103,7 @@ class PersiDict(MutableMapping):
         return repr_str
 
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Return str(self)"""
         return str(dict(self.items()))
 
@@ -247,7 +248,7 @@ class PersiDict(MutableMapping):
         """
         raise NotImplementedError
 
-    def subdicts(self) -> Dict[str, PersiDict]:
+    def subdicts(self) -> dict[str, PersiDict]:
         """Get a dictionary of sub-dictionaries.
 
         This method is absent in the original dict API.

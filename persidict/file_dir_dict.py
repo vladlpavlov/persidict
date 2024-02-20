@@ -10,7 +10,7 @@ as a binary, or as a json object, or as a plain text
 from __future__ import annotations
 
 import os
-from typing import Any, Optional, Union
+from typing import Any, Optional
 
 import joblib
 import jsonpickle
@@ -103,7 +103,7 @@ class FileDirDict(PersiDict):
             num_files += len(files)
         return num_files
 
-    def clear(self):
+    def clear(self) -> None:
         """ Remove all elements from the dictionary."""
 
         assert not self.immutable_items, (
@@ -144,7 +144,7 @@ class FileDirDict(PersiDict):
             return os.path.join(*dir_names)
 
 
-    def get_subdict(self, key:PersiDictKey):
+    def get_subdict(self, key:PersiDictKey) -> FileDirDict:
         """Get a subdictionary containing items with the same prefix_key.
 
         This method is absent in the original dict API.

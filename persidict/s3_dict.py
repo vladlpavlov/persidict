@@ -84,7 +84,7 @@ class S3Dict(PersiDict):
             self.root_prefix += "/"
 
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """Return repr(self)."""
 
         repr_str = super().__repr__()
