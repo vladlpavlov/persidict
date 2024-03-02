@@ -193,6 +193,12 @@ class PersiDict(MutableMapping):
         except:
             return False
 
+    def __getstate__(self):
+        raise TypeError("PersiDict is not picklable.")
+
+    def __setstate__(self, state):
+        raise TypeError("PersiDict is not picklable.")
+
 
     @abstractmethod
     def mtimestamp(self, key:PersiDictKey) -> float:

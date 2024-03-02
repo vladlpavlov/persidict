@@ -152,6 +152,8 @@ def test_subdicts(tmpdir, DictToTest, kwargs):
     sbscts = fdd.subdicts()
     assert len(sbscts) == 3
 
+    print(f"{fdd.__dict__}")
+
     fdd.clear()
     assert len(fdd.get_subdict("a")) == 0
     assert len(fdd.get_subdict("b")) == 0
@@ -325,3 +327,4 @@ def test_work_with_python_src(tmpdir, DictToTest, kwargs):
     assert dict_to_test["my_function"] == src
 
     dict_to_test.clear()
+
