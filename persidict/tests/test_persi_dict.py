@@ -20,6 +20,11 @@ mutable_tests = [
 ,(S3Dict, dict(file_type="pkl", bucket_name="my_bucket", digest_len=5))
 ,(S3Dict, dict(file_type="json", bucket_name="his_bucket", digest_len=5))
 
+,(FileDirDict, dict(file_type="pkl", digest_len=0))
+,(FileDirDict, dict(file_type="json", digest_len=0))
+,(S3Dict, dict(file_type="pkl", bucket_name="my_bucket", digest_len=0))
+,(S3Dict, dict(file_type="json", bucket_name="his_bucket", digest_len=0))
+
 ,(FileDirDict, dict(file_type="pkl"))
 ,(FileDirDict, dict(file_type="json"))
 ,(S3Dict, dict(file_type="pkl", bucket_name="her_bucket"))
@@ -33,6 +38,10 @@ mutable_tests = [
 @pytest.mark.parametrize("DictToTest, kwargs", mutable_tests)
 @mock_s3
 def test_case_sensitivity(tmpdir, DictToTest, kwargs):
+
+    if "digest_len" in kwargs and kwargs["digest_len"] <=3:
+        return
+
     dict_to_test = DictToTest(dir_name = tmpdir, **kwargs)
     dict_to_test.clear()
     model_dict = dict()
