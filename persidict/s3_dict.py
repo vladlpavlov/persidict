@@ -150,7 +150,8 @@ class S3Dict(PersiDict):
         if self.base_class_for_values is not None:
             if not isinstance(value, self.base_class_for_values):
                 raise TypeError(
-                    f"Value must be of type {self.base_class_for_values}")
+                    f"Value must be of type {self.base_class_for_values},"
+                    + f"but it is {type(value)} instead." )
 
         key = SafeStrTuple(key)
         file_name = self.local_cache._build_full_path(key, create_subdirs=True)
