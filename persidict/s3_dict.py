@@ -262,13 +262,17 @@ class S3Dict(PersiDict):
         new_dir_path = self.local_cache._build_full_path(
             key, create_subdirs = True, is_file_path = False)
 
-        return S3Dict(
+        new_dict = S3Dict(
             bucket_name = self.bucket_name
             , region = self.region
             , root_prefix = full_root_prefix
             , dir_name = new_dir_path
             , file_type = self.file_type
-            , immutable_items = self.immutable_items)
+            , immutable_items = self.immutable_items
+            , digest_len = self.digest_len
+            , base_class_for_values = self.base_class_for_values)
+
+        return new_dict
 
 
     def mtimestamp(self,key:PersiDictKey) -> float:
