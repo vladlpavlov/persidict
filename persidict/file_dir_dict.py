@@ -155,7 +155,9 @@ class FileDirDict(PersiDict):
         return FileDirDict(
             dir_name = full_dir_path
             , file_type=self.file_type
-            , immutable_items= self.immutable_items)
+            , immutable_items= self.immutable_items
+            , digest_len=self.digest_len
+            , base_class_for_values=self.base_class_for_values)
 
     def _read_from_file(self, file_name:str) -> Any:
         """Read a value from a file. """

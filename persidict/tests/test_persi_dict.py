@@ -15,6 +15,11 @@ mutable_tests = [
 ,(S3Dict, dict(file_type="pkl", bucket_name="my_bucket", digest_len=11))
 ,(S3Dict, dict(file_type="json", bucket_name="his_bucket", digest_len=11))
 
+,(FileDirDict, dict(file_type="pkl", digest_len=5))
+,(FileDirDict, dict(file_type="json", digest_len=5))
+,(S3Dict, dict(file_type="pkl", bucket_name="my_bucket", digest_len=5))
+,(S3Dict, dict(file_type="json", bucket_name="his_bucket", digest_len=5))
+
 ,(FileDirDict, dict(file_type="pkl"))
 ,(FileDirDict, dict(file_type="json"))
 ,(S3Dict, dict(file_type="pkl", bucket_name="her_bucket"))
@@ -126,6 +131,18 @@ def test_subdicts(tmpdir, DictToTest, kwargs):
     fdd[("b", "b_1")] = 1000
     assert len(fdd.get_subdict("a")) == 2
     assert len(fdd.get_subdict("b")) == 1
+    sbscts = fdd.subdicts()
+    assert len(sbscts) == 2
+
+    fdd[("b", "b_2")] = 10000
+    fdd[("b", "b_3")] = 100000
+    fdd[("c", "c_1")] = None
+    assert len(fdd.get_subdict("a")) == 2
+    assert len(fdd.get_subdict("b")) == 3
+    assert len(fdd.get_subdict("c")) == 1
+    sbscts = fdd.subdicts()
+    assert len(sbscts) == 3
+
     fdd.clear()
     assert len(fdd.get_subdict("a")) == 0
     assert len(fdd.get_subdict("b")) == 0
