@@ -147,6 +147,11 @@ class S3Dict(PersiDict):
     def __setitem__(self, key:PersiDictKey, value:Any):
         """Set self[key] to value. """
 
+        if isinstance(value, PersiDict):
+            raise TypeError(
+                f"You are not allowed to store a PersiDict "
+                + f"inside another PersiDict.")
+
         if self.base_class_for_values is not None:
             if not isinstance(value, self.base_class_for_values):
                 raise TypeError(
