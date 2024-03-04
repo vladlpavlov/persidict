@@ -140,6 +140,8 @@ def test_subdicts(tmpdir, DictToTest, kwargs):
     fdd[("b", "b_1")] = 1000
     assert len(fdd.get_subdict("a")) == 2
     assert len(fdd.get_subdict("b")) == 1
+    assert len(fdd.get_subdict("f")) == 0
+    assert len(fdd.get_subdict(("i","j","k"))) == 0
     sbscts = fdd.subdicts()
     assert len(sbscts) == 2
 
