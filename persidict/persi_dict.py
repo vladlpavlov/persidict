@@ -248,7 +248,9 @@ class PersiDict(MutableMapping):
 
 
     def get_subdict(self, prefix_key:PersiDictKey) -> PersiDict:
-        """Get a sub-dictionary containing items with the same prefix_key.
+        """Get a sub-dictionary containing items with the same prefix key.
+
+        For non-existing prefix key, an empty sub-dictionary is returned.
 
         This method is absent in the original dict API.
         """

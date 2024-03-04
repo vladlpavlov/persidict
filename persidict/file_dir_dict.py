@@ -145,7 +145,9 @@ class FileDirDict(PersiDict):
 
 
     def get_subdict(self, key:PersiDictKey) -> FileDirDict:
-        """Get a subdictionary containing items with the same prefix_key.
+        """Get a subdictionary containing items with the same prefix key.
+
+        For non-existing prefix key, an empty sub-dictionary is returned.
 
         This method is absent in the original dict API.
         """
