@@ -241,8 +241,11 @@ class PersiDict(MutableMapping):
         key = SafeStrTuple(key)
 
         if key in self:
-            del self[key]
-            return True
+            try:
+                del self[key]
+                return True
+            except:
+                return False
         else:
             return False
 
