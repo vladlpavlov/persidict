@@ -76,7 +76,7 @@ class PersiDict(MutableMapping):
                     will be performed and all types will be allowed.
 
     """
-    # TODO: refactor to support variable length of min_digest_len
+
     digest_len:int
     immutable_items:bool
     base_class_for_values:type
@@ -211,8 +211,14 @@ class PersiDict(MutableMapping):
 
     def clear(self) -> None:
         """Remove all items from the dictionary. """
+        if self.immutable_items: # TODO: change to exceptions
+            assert False, "Can't delete an immutable key-value pair"
+
         for k in self.keys():
-            del self[k]
+            try:
+                del self[k]
+            except:
+                pass
 
 
     def random_keys(self, max_n:int):
