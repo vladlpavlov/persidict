@@ -277,27 +277,31 @@ class PersiDict(MutableMapping):
         raise NotImplementedError
 
 
-    def oldest_keys(self, max_n):
+    def oldest_keys(self, max_n=None):
         """Return max_n the oldest keys in the dictionary.
+
+        If max_n is None, return all keys.
 
         This method is absent in the original Python dict API.
         """
         all_keys = list(self.keys())
         all_keys.sort(key=lambda k: self.timestamp(k))
-        if max_n > len(all_keys):
+        if max_n is None or max_n > len(all_keys):
             max_n = len(all_keys)
         result = all_keys[:max_n]
         return result
 
 
-    def newest_keys(self, max_n):
+    def newest_keys(self, max_n=None):
         """Return max_n the newest keys in the dictionary.
+
+        If max_n is None, return all keys.
 
         This method is absent in the original Python dict API.
         """
         all_keys = list(self.keys())
         all_keys.sort(key=lambda k: self.timestamp(k), reverse=True)
-        if max_n > len(all_keys):
+        if max_n is None or max_n > len(all_keys):
             max_n = len(all_keys)
         result = all_keys[:max_n]
         return result
