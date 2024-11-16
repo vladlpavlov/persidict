@@ -125,7 +125,8 @@ that simultaneously work with the same instance of a dictionary.
 * You can not assign initial key-value pairs to a dictionary in its constructor.
 * `PersiDict` API has additional methods `delete_if_exists()`, `timestamp()`,
 `get_subdict()`, `subdicts()`, `random_keys()`, `newest_keys()`, 
-and `oldest_keys()` , which are not available in Python dicts.
+`oldest_keys()`, `newest_values()`, and `oldest_values()`, 
+* which are not available in native Python dicts.
 
 ## Fine Tuning
 
