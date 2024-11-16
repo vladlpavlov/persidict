@@ -12,7 +12,7 @@ Only text strings, or sequences of strings, are allowed as keys.
 Unlike other persistent dictionaries (e.g. Python's native `shelve`), 
 `persidict` is suitable for work in highly **distributed environments**, 
 where multiple instances of a program run in parallel on 
-a large number of different machines.
+a large number of machines.
 
 ## Usage
 Class 'FileDirDict' is a persistent dictionary that stores its content 
@@ -21,7 +21,9 @@ in a folder on a disk.
     from persidict import FileDirDict    
     my_dictionary = FileDirDict(dir_name="my_folder")
 
-Once created, it can be used as a regular Python dictionary:
+Once created, it can be used as a regular Python dictionary 
+that stores key-value pairs. A key must be a sequence of strings, 
+a value can be any (pickleable) Python object:
 
     my_dictionary["Eliza"] = "MIT Eliza was a mock psychotherapist."
     my_dictionary["Eliza","year"] = 1965
@@ -47,19 +49,18 @@ If you run the code above, it will produce the following output:
     >>> ['Eliza', 'authors'] ==> ['Joseph Weizenbaum']
     >>> ['Eliza', 'year'] ==> 1965
 
-Behind the scenes, the dictionary will create a folder named "my_folder" 
-on a local disk. Each key-value pair will be stored as a separate file 
-in this folder. 
+The dictionary automatically creates a folder named "my_folder" 
+on the local disk. Each key-value pair is stored as 
+a separate file within this folder.
 
-If the key is a string, the string will be used to create 
-a filename for the object. If the key is a sequence of strings, 
-all but the last strings in the sequence will be used to create a name 
-for a sub-folder in the main folder; 
-the last string will be used to create a filename for the object 
-which will be placed in the sub-folder.
+If the key is a string, it becomes the filename for the object. 
+If the key is a sequence of strings, all strings except the last 
+are used to create nested subfolders within the main folder. 
+The final string in the sequence serves as the filename for the object, 
+which is stored in the deepest subfolder.
 
-Persistent dictionaries only accept sequences 
-of strings as keys. Any pickleable Python object can be used as a value. 
+Persistent dictionaries only accept sequences of strings as keys. 
+Any pickleable Python object can be used as a value. 
 Unlike regular Python dictionaries, insertion order is not preserved.
 
     del my_dictionary
@@ -79,9 +80,9 @@ But you can share this folder with other machines
 (for example, using Dropbox or NFS), and work with the same dictionary 
 simultaneously from multiple computers (from multiple instances of your program). 
 This approach would allow you to use a persistent dictionary in 
-a system that is distributed over dozens or hundreds of computers.
+a system that is distributed over dozens of computers.
 
-If you need to run your program on thousands (or more) computers, 
+If you need to run your program on hundreds (or more) computers, 
 class `S3Dict` is a better choice: it's a persistent dictionary that 
 stores its content in an AWS S3 bucket.
 
@@ -123,9 +124,9 @@ that simultaneously work with the same instance of a dictionary.
 * You can constrain values to be an instance of a specific class.
 * Insertion order is not preserved.
 * You can not assign initial key-value pairs to a dictionary in its constructor.
-* `PersiDict` API has additional methods `delete_if_exists()`, `mtimestamp()`,
-`get_subdict()`, random_keys(), and `subdicts()` , which are 
-not available in Python dicts.
+* `PersiDict` API has additional methods `delete_if_exists()`, `timestamp()`,
+`get_subdict()`, `subdicts()`, `random_keys()`, `newest_keys()`, 
+and `oldest_keys()` , which are not available in Python dicts.
 
 ## Fine Tuning
 

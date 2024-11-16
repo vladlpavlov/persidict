@@ -73,7 +73,8 @@ class FileDirDict(PersiDict):
                 not issubclass(base_class_for_values,str)):
             assert file_type in {"json", "pkl"}, ("For non-string values"
                 + " file_type must be either 'pkl' or 'json'.")
-        assert not os.path.isfile(dir_name)
+        if os.path.isfile(dir_name):
+            raise ValueError(f"{dir_name} is a file, not a directory.")
         if not os.path.isdir(dir_name):
             os.mkdir(dir_name)
         assert os.path.isdir(dir_name)
@@ -106,8 +107,8 @@ class FileDirDict(PersiDict):
     def clear(self) -> None:
         """ Remove all elements from the dictionary."""
 
-        assert not self.immutable_items, (
-            "Can't clear a dict that contains immutable items")
+        if self.immutable_items:
+            raise KeyError("Can't clear a dict that contains immutable items")
 
         for subdir_info in os.walk(self.base_dir, topdown=False):
             (subdir_name, _, files) = subdir_info
@@ -230,9 +231,8 @@ class FileDirDict(PersiDict):
 
         key = SafeStrTuple(key)
         filename = self._build_full_path(key, create_subdirs=True)
-        if self.immutable_items:
-            assert not os.path.exists(filename), (
-                "Can't modify an immutable item")
+        if self.immutable_items and os.path.exists(filename):
+            raise KeyError("Can't modify an immutable item")
         self._save_to_file(filename, value)
 
     def __delitem__(self, key:PersiDictKey) -> None:
@@ -286,7 +286,7 @@ class FileDirDict(PersiDict):
         return step()
 
 
-    def mtimestamp(self, key:PersiDictKey) -> float:
+    def timestamp(self, key:PersiDictKey) -> float:
         """Get last modification time (in seconds, Unix epoch time).
 
         This method is absent in the original dict API.

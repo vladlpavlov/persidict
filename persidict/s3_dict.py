@@ -174,7 +174,8 @@ class S3Dict(PersiDict):
                 except:
                     key_is_present = False
 
-            assert not key_is_present, "Can't modify an immutable item"
+            if key_is_present:
+                raise KeyError("Can't modify an immutable item")
 
         self.local_cache._save_to_file(file_name, value)
         self.s3_client.upload_file(file_name, self.bucket_name, obj_name)
@@ -186,7 +187,8 @@ class S3Dict(PersiDict):
         """Delete self[key]. """
 
         key = SafeStrTuple(key)
-        assert not self.immutable_items, "Can't delete an immutable item"
+        if self.immutable_items:
+            raise KeyError("Can't delete an immutable item")
         obj_name = self._build_full_objectname(key)
         self.s3_client.delete_object(Bucket = self.bucket_name, Key = obj_name)
         file_name = self.local_cache._build_full_path(key)
@@ -282,7 +284,7 @@ class S3Dict(PersiDict):
         return new_dict
 
 
-    def mtimestamp(self,key:PersiDictKey) -> float:
+    def timestamp(self,key:PersiDictKey) -> float:
         """Get last modification time (in seconds, Unix epoch time).
 
         This method is absent in the original dict API.

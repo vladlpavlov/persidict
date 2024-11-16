@@ -48,7 +48,7 @@ class PersiDict(MutableMapping):
     The API for the class resembles the API of Python's built-in Dict
     (see https://docs.python.org/3/library/stdtypes.html#mapping-types-dict)
     with a few variations (e.g. insertion order is not preserved) and
-    a few additional methods(e.g. .mtimestamp(key), which returns last
+    a few additional methods(e.g. .timestamp(key), which returns last
     modification time for a key).
 
     Attributes
@@ -79,15 +79,16 @@ class PersiDict(MutableMapping):
 
     digest_len:int
     immutable_items:bool
-    base_class_for_values:type
+    base_class_for_values:Optional[type]
 
     def __init__(self
                  , immutable_items:bool
                  , digest_len:int = 8
                  , base_class_for_values:Optional[type] = None
                  , *args, **kwargas):
-        assert digest_len >= 0
         self.digest_len = int(digest_len)
+        if digest_len < 0:
+            raise ValueError("digest_len must be non-negative")
         self.immutable_items = bool(immutable_items)
         self.base_class_for_values = base_class_for_values
 
@@ -122,15 +123,16 @@ class PersiDict(MutableMapping):
 
     def __setitem__(self, key:PersiDictKey, value:Any):
         """Set self[key] to value."""
-        if self.immutable_items: # TODO: change to exceptions
-            assert key not in self, "Can't modify an immutable key-value pair"
+        if self.immutable_items:
+            if key in self:
+                raise KeyError("Can't modify an immutable key-value pair")
         raise NotImplementedError
 
 
     def __delitem__(self, key:PersiDictKey):
         """Delete self[key]."""
         if self.immutable_items: # TODO: change to exceptions
-            assert False, "Can't delete an immutable key-value pair"
+            raise KeyError("Can't delete an immutable key-value pair")
         raise NotImplementedError
 
 
@@ -172,7 +174,7 @@ class PersiDict(MutableMapping):
 
         Return the value for key if key is in the dictionary, else default.
         """
-        # TODO: check age cases to ensure the same semantics as standard dicts
+        # TODO: check edge cases to ensure the same semantics as standard dicts
         key = SafeStrTuple(key)
         if key in self:
             return self[key]
@@ -200,37 +202,16 @@ class PersiDict(MutableMapping):
         raise TypeError("PersiDict is not picklable.")
 
 
-    @abstractmethod
-    def mtimestamp(self, key:PersiDictKey) -> float:
-        """Get last modification time (in seconds, Unix epoch time).
-
-        This method is absent in the original dict API.
-        """
-        raise NotImplementedError
-
-
     def clear(self) -> None:
         """Remove all items from the dictionary. """
         if self.immutable_items: # TODO: change to exceptions
-            assert False, "Can't delete an immutable key-value pair"
+            raise KeyError("Can't delete an immutable key-value pair")
 
         for k in self.keys():
             try:
                 del self[k]
             except:
                 pass
-
-
-    def random_keys(self, max_n:int):
-        """Return a list of random keys from the dictionary.
-
-        This method is absent in the original dict API.
-        """
-        all_keys = list(self.keys())
-        if max_n > len(all_keys):
-            max_n = len(all_keys)
-        result = random.sample(all_keys, max_n)
-        return result
 
 
     def delete_if_exists(self, key:PersiDictKey) -> bool:
@@ -242,7 +223,7 @@ class PersiDict(MutableMapping):
         """
 
         if self.immutable_items: # TODO: change to exceptions
-            assert False, "Can't delete an immutable key-value pair"
+            raise KeyError("Can't delete an immutable key-value pair")
 
         key = SafeStrTuple(key)
 
@@ -261,7 +242,7 @@ class PersiDict(MutableMapping):
 
         For non-existing prefix key, an empty sub-dictionary is returned.
 
-        This method is absent in the original dict API.
+        This method is absent in the original Python dict API.
         """
         raise NotImplementedError
 
@@ -273,3 +254,50 @@ class PersiDict(MutableMapping):
         all_keys = {k[0] for k in self.keys()}
         result_subdicts = {k: self.get_subdict(k) for k in all_keys}
         return result_subdicts
+
+
+    def random_keys(self, max_n:int):
+        """Return a list of random keys from the dictionary.
+
+        This method is absent in the original Python dict API.
+        """
+        all_keys = list(self.keys())
+        if max_n > len(all_keys):
+            max_n = len(all_keys)
+        result = random.sample(all_keys, max_n)
+        return result
+
+
+    @abstractmethod
+    def timestamp(self, key:PersiDictKey) -> float:
+        """Get last modification time (in seconds, Unix epoch time).
+
+        This method is absent in the original dict API.
+        """
+        raise NotImplementedError
+
+
+    def oldest_keys(self, max_n):
+        """Return max_n the oldest keys in the dictionary.
+
+        This method is absent in the original Python dict API.
+        """
+        all_keys = list(self.keys())
+        all_keys.sort(key=lambda k: self.timestamp(k))
+        if max_n > len(all_keys):
+            max_n = len(all_keys)
+        result = all_keys[:max_n]
+        return result
+
+
+    def newest_keys(self, max_n):
+        """Return max_n the newest keys in the dictionary.
+
+        This method is absent in the original Python dict API.
+        """
+        all_keys = list(self.keys())
+        all_keys.sort(key=lambda k: self.timestamp(k), reverse=True)
+        if max_n > len(all_keys):
+            max_n = len(all_keys)
+        result = all_keys[:max_n]
+        return result
