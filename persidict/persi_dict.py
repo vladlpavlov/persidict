@@ -305,3 +305,21 @@ class PersiDict(MutableMapping):
             max_n = len(all_keys)
         result = all_keys[:max_n]
         return result
+
+    def oldest_values(self, max_n=None):
+        """Return max_n the oldest values in the dictionary.
+
+        If max_n is None, return all values.
+
+        This method is absent in the original Python dict API.
+        """
+        return [self[k] for k in self.oldest_keys(max_n)]
+
+    def newest_values(self, max_n=None):
+        """Return max_n the newest values in the dictionary.
+
+        If max_n is None, return all values.
+
+        This method is absent in the original Python dict API.
+        """
+        return [self[k] for k in self.newest_keys(max_n)]
