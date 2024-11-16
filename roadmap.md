@@ -1,6 +1,7 @@
 # Development Roadmap for PersiDict project
 
-1. Refactor and extend testing suite.
+1. Refactor and extend testing suite (split into large number of small files, 
+add testing support infrastructure for work with multiple backends).
 2. Add support for more storage backends, starting with Azure and GCP.
 3. Add backend-specific optimizations for time-consuming operations.
 4. Add compatibility tests/support for more Python libraries, 

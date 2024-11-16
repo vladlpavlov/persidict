@@ -7,12 +7,11 @@ Simple persistent dictionaries for Python.
 `persidict` offers a simple persistent key-value store for Python. 
 It saves the content of the dictionary in a folder on a disk 
 or in an S3 bucket on AWS. Each value is stored as a separate file / S3 object.
-Only text strings, or sequences of strings, are allowed as keys.
+Only text strings or sequences of strings are allowed as keys.
 
 Unlike other persistent dictionaries (e.g. Python's native `shelve`), 
-`persidict` is suitable for work in highly **distributed environments**, 
-where multiple instances of a program run in parallel on 
-a large number of machines.
+`persidict` is designed for use in highly **distributed environments**, 
+where multiple instances of a program run concurrently across many machines.
 
 ## Usage
 Class 'FileDirDict' is a persistent dictionary that stores its content 
