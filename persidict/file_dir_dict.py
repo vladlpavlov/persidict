@@ -75,7 +75,7 @@ class FileDirDict(PersiDict):
                 + " file_type must be either 'pkl' or 'json'.")
         if os.path.isfile(dir_name):
             raise ValueError(f"{dir_name} is a file, not a directory.")
-        try:
+        try: # weird code to better handle concurrency TODO: refactor
             if not os.path.isdir(dir_name):
                 os.mkdir(dir_name)
         except:
@@ -139,7 +139,7 @@ class FileDirDict(PersiDict):
             current_dir = dir_names[0]
             for dir_name in dir_names[1:]:
                 new_dir = os.path.join(current_dir, dir_name)
-                try:
+                try: # weird code to better handle concurrency TODO: refactor
                     if not os.path.isdir(new_dir):
                         os.mkdir(new_dir)
                 except:
