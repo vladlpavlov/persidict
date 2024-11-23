@@ -1,9 +1,9 @@
 # Development Roadmap for PersiDict project
 
-1. Refactor and extend testing suite (split into large number of small files, 
-add testing support infrastructure for work with multiple backends).
-2. Add support for more storage backends, starting with Azure and GCP.
-3. Add backend-specific optimizations for time-consuming operations.
-4. Add compatibility tests/support for more Python libraries, 
+* Add compatibility tests/support for more Python libraries, 
 starting with those popular in the DS/ML/AI community 
 (TensorFlow, PyTorch, SKLearn, Polars, LightGBM, etc.).
+* Add support for more storage backends, starting with Azure and GCP.
+* Add max_scan_size attribute to base PersiDict class to 
+limit the number of rows scanned by PersiDict methods.
+* Add backend-specific optimizations for time-consuming operations.
