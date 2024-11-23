@@ -10,6 +10,8 @@ as a binary, or as a json object, or as a plain text
 from __future__ import annotations
 
 import os
+import random
+import time
 from typing import Any, Optional
 
 import joblib
@@ -76,10 +78,11 @@ class FileDirDict(PersiDict):
         if os.path.isfile(dir_name):
             raise ValueError(f"{dir_name} is a file, not a directory.")
 
-        try: # weird code to better handle concurrency TODO: refactor
+        try: # extra protection to better handle concurrent access
             if not os.path.isdir(dir_name):
                 os.mkdir(dir_name)
         except:
+            time.sleep(random.random()/random.randint(1, 3))
             if not os.path.isdir(dir_name):
                 os.mkdir(dir_name)
         assert os.path.isdir(dir_name)
@@ -139,10 +142,11 @@ class FileDirDict(PersiDict):
             current_dir = dir_names[0]
             for dir_name in dir_names[1:]:
                 new_dir = os.path.join(current_dir, dir_name)
-                try: # weird code to better handle concurrency TODO: refactor
+                try: # extra protection to better handle concurrent access
                     if not os.path.isdir(new_dir):
                         os.mkdir(new_dir)
                 except:
+                    time.sleep(random.random()/random.randint(1, 3))
                     if not os.path.isdir(new_dir):
                         os.mkdir(new_dir)
                 current_dir = new_dir
@@ -171,7 +175,7 @@ class FileDirDict(PersiDict):
             , digest_len=self.digest_len
             , base_class_for_values=self.base_class_for_values)
 
-    def _read_from_file(self, file_name:str) -> Any:
+    def _read_from_file_impl(self, file_name:str) -> Any:
         """Read a value from a file. """
 
         if self.file_type == "pkl":
@@ -180,15 +184,30 @@ class FileDirDict(PersiDict):
         elif self.file_type == "json":
             with open(file_name, 'r') as f:
                 result = jsonpickle.loads(f.read())
-        elif issubclass(self.base_class_for_values, str):
+        else:
             with open(file_name, 'r') as f:
                 result = f.read()
-        else:
-            raise ValueError("When base_class_for_values is not str,"
-                + " file_type must be pkl or json.")
         return result
 
-    def _save_to_file(self, file_name:str, value:Any) -> None:
+    def _read_from_file(self,file_name:str) -> Any:
+        """Read a value from a file. """
+
+        if not (self.file_type in {"pkl", "json"} or issubclass(
+            self.base_class_for_values, str)):
+            raise ValueError("When base_class_for_values is not str,"
+                + " file_type must be pkl or json.")
+
+        n_retries = 8
+        # extra protections to better handle concurrent writes
+        for i in range(n_retries):
+            try:
+                return self._read_from_file_impl(file_name)
+            except:
+                time.sleep(random.random()/random.randint(1, 10))
+
+        return self._read_from_file_impl(file_name)
+
+    def _save_to_file_impl(self, file_name:str, value:Any) -> None:
         """Save a value to a file. """
 
         if self.file_type == "pkl":
@@ -197,12 +216,28 @@ class FileDirDict(PersiDict):
         elif self.file_type == "json":
             with open(file_name, 'w') as f:
                 f.write(jsonpickle.dumps(value, indent=4))
-        elif issubclass(self.base_class_for_values, str):
+        else:
             with open(file_name, 'w') as f:
                 f.write(value)
-        else:
+
+    def _save_to_file(self, file_name:str, value:Any) -> None:
+        """Save a value to a file. """
+
+        if not (self.file_type in {"pkl", "json"} or issubclass(
+            self.base_class_for_values, str)):
             raise ValueError("When base_class_for_values is not str,"
-                + " file_type must be either 'pkl' or 'json'")
+                + " file_type must be pkl or json.")
+
+        n_retries = 3
+        # extra protections to better handle concurrent writes
+        for i in range(n_retries):
+            try: # extra protections to better handle concurrent writes
+                self._save_to_file_impl(file_name, value)
+                return
+            except:
+                time.sleep(random.random()/random.randint(1, 5))
+
+        self._save_to_file_impl(file_name, value)
 
     def __contains__(self, key:PersiDictKey) -> bool:
         """True if the dictionary has the specified key, else False. """
