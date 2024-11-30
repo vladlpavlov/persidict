@@ -160,7 +160,7 @@ filesystems, such as MacOS HFS. The default value is 8.
 ## How To Get It?
 
 The source code is hosted on GitHub at:
-[https://github.com/vladlpavlov/persidict](https://github.com/vladlpavlov/persidict) 
+[https://github.com/pythagoras-dev/persidict](https://github.com/pythagoras-dev/persidict) 
 
 Binary installers for the latest released version are available at the Python package index at:
 [https://pypi.org/project/persidict](https://pypi.org/project/persidict)
