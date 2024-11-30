@@ -285,7 +285,8 @@ class PersiDict(MutableMapping):
         This method is absent in the original Python dict API.
         """
         all_keys = list(self.keys())
-        all_keys.sort(key=lambda k: self.timestamp(k))
+        # all_keys.sort(key=lambda k: self.timestamp(k))
+        all_keys.sort(key=self.timestamp)
         if max_n is None or max_n > len(all_keys):
             max_n = len(all_keys)
         result = all_keys[:max_n]
@@ -300,7 +301,8 @@ class PersiDict(MutableMapping):
         This method is absent in the original Python dict API.
         """
         all_keys = list(self.keys())
-        all_keys.sort(key=lambda k: self.timestamp(k), reverse=True)
+        # all_keys.sort(key=lambda k: self.timestamp(k), reverse=True)
+        all_keys.sort(key=self.timestamp, reverse=True)
         if max_n is None or max_n > len(all_keys):
             max_n = len(all_keys)
         result = all_keys[:max_n]
