@@ -12,7 +12,7 @@ setuptools.setup(
         "Values are stored as files on a disk or as S3 objects on AWS cloud."
     ,long_description=long_description
     ,long_description_content_type="text/markdown"
-    ,url="https://github.com/vladlpavlov/persidict"
+    ,url="https://github.com/pythagoras-dev/persidict"
     ,packages=["persidict"]
     ,classifiers=[
         "Development Status :: 3 - Alpha"
