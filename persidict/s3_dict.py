@@ -30,12 +30,12 @@ class S3Dict(PersiDict):
     bucket_name: str
     root_prefix: str
     file_type: str
-    dir_name: str
+    base_dir: str
 
     def __init__(self, bucket_name:str = "my_bucket"
                  , region:str = None
                  , root_prefix:str = ""
-                 , dir_name:str = "S3_Dict"
+                 , base_dir:str = "__s3_dict__"
                  , file_type:str = "pkl"
                  , immutable_items:bool = False
                  , digest_len:int = 8
@@ -49,7 +49,7 @@ class S3Dict(PersiDict):
 
         root_prefix is a common S3 prefix for all objectnames in a dictionary.
 
-        dir_name is a local directory that will be used to store tmp files.
+        base_dir is a local directory that will be used to store tmp files.
 
         base_class_for_values constraints the type of values that can be
         stored in the dictionary. If specified, it will be used to
@@ -68,7 +68,7 @@ class S3Dict(PersiDict):
         self.file_type = file_type
 
         self.local_cache = FileDirDict(
-            dir_name = dir_name
+            base_dir= base_dir
             , file_type = file_type
             , immutable_items = immutable_items
             , base_class_for_values=base_class_for_values
@@ -92,7 +92,7 @@ class S3Dict(PersiDict):
         """Return repr(self)."""
 
         repr_str = super().__repr__()
-        repr_str = repr_str[:-1] + f", dir_name={self.local_cache.base_dir}"
+        repr_str = repr_str[:-1] + f", base_dir={self.local_cache.base_dir}"
         repr_str += f", file_type={self.file_type}"
         repr_str += f", region={self.region}"
         repr_str += f", bucket_name={self.bucket_name}"
@@ -119,7 +119,7 @@ class S3Dict(PersiDict):
             region = None
             , bucket_name = "my_bucket"
             , root_prefix = ""
-            , dir_name = "S3_Dict"
+            , base_dir = "__s3_dict__"
             , file_type = "pkl"
             , immutable_items = False
             , digest_len = 8
@@ -305,7 +305,7 @@ class S3Dict(PersiDict):
             bucket_name = self.bucket_name
             , region = self.region
             , root_prefix = full_root_prefix
-            , dir_name = new_dir_path
+            , base_dir = new_dir_path
             , file_type = self.file_type
             , immutable_items = self.immutable_items
             , digest_len = self.digest_len

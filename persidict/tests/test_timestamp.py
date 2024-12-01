@@ -7,7 +7,7 @@ from persidict import FileDirDict, S3Dict, SafeStrTuple
 def test_timestamp(tmpdir):
     """test timestamp methods."""
     for d in [
-        FileDirDict(dir_name = tmpdir.mkdir("LOCAL"))
+        FileDirDict(base_dir= tmpdir.mkdir("LOCAL"))
         ,S3Dict(dir_name = tmpdir.mkdir("AWS"), bucket_name ="mybucket")
         ]:
         for v in "abcdefg":

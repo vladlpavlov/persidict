@@ -13,7 +13,7 @@ from persidict.tests.data_for_mutable_tests import mutable_tests
 @pytest.mark.parametrize("DictToTest, kwargs", mutable_tests)
 @mock_aws
 def test_random_keys(tmpdir, DictToTest, kwargs):
-    dict_to_test = DictToTest(dir_name = tmpdir, **kwargs)
+    dict_to_test = DictToTest(base_dir = tmpdir, **kwargs)
     for n in range(10):
         dict_to_test[str(n)] = n**2
         dict_len = len(dict_to_test)

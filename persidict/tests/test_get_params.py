@@ -14,11 +14,11 @@ from persidict.tests.data_for_mutable_tests import mutable_tests
 @mock_aws
 def test_get_params(tmpdir, DictToTest, kwargs):
     """Test .get_params() method."""
-    dict_to_test = DictToTest(dir_name=tmpdir, **kwargs)
+    dict_to_test = DictToTest(base_dir=tmpdir, **kwargs)
     dict_to_test.clear()
     model_params = DictToTest.get_default_params()
     model_params.update(kwargs)
-    model_params["dir_name"] = str(tmpdir)
+    model_params["base_dir"] = str(tmpdir)
 
     if "root_prefix" in model_params:
         if isinstance(model_params["root_prefix"], str):
@@ -34,8 +34,15 @@ def test_get_params(tmpdir, DictToTest, kwargs):
 @pytest.mark.parametrize("DictToTest, kwargs", mutable_tests)
 @mock_aws
 def test_get_default_params(tmpdir, DictToTest, kwargs):
-    dict_to_test_1 = DictToTest(dir_name=tmpdir)
+    # dict_to_test_1 = DictToTest(base_dir=tmpdir)
+    # dict_to_test_2 = DictToTest(**{
+    #     **DictToTest.get_default_params()
+    #     ,**dict(base_dir=tmpdir)})
+    # assert dict_to_test_1.get_params() == dict_to_test_2.get_params()
+
+
+    dict_to_test_1 = DictToTest()
     dict_to_test_2 = DictToTest(**{
         **DictToTest.get_default_params()
-        ,**dict(dir_name=tmpdir)})
+        ,**dict()})
     assert dict_to_test_1.get_params() == dict_to_test_2.get_params()

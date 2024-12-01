@@ -23,7 +23,7 @@ def test_work_with_basic_datatypes(tmpdir, DictToTest, kwargs):
                     ,True
                     ,(1,2,3,4,5,(6,7,8,9,10,(11,12,13,14,15)))
                     ]
-    dict_to_test = DictToTest(dir_name=tmpdir, **kwargs)
+    dict_to_test = DictToTest(base_dir=tmpdir, **kwargs)
     dict_to_test.clear()
     model_dict = dict()
     for i,d in enumerate(sample_data):

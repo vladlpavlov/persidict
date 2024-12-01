@@ -40,18 +40,18 @@ class FileDirDict(PersiDict):
     text files (either in jason format or as a plain text).
     """
 
-    dir_name:str
+    base_dir:str
     file_type:str
 
     def __init__(self
-                 , dir_name: str = "FileDirDict"
+                 , base_dir: str = "__file_dir_dict__"
                  , file_type: str = "pkl"
                  , immutable_items:bool = False
                  , digest_len:int = 8
                  , base_class_for_values: Optional[type] = None):
         """A constructor defines location of the store and file format to use.
 
-        dir_name is a directory that will contain all the files in
+        base_dir is a directory that will contain all the files in
         the FileDirDict. If the directory does not exist, it will be created.
 
         base_class_for_values constraints the type of values that can be
@@ -78,25 +78,28 @@ class FileDirDict(PersiDict):
                 not issubclass(base_class_for_values,str)):
             assert file_type in {"json", "pkl"}, ("For non-string values"
                 + " file_type must be either 'pkl' or 'json'.")
-        if os.path.isfile(dir_name):
-            raise ValueError(f"{dir_name} is a file, not a directory.")
+
+        base_dir = str(base_dir)
+
+        if os.path.isfile(base_dir):
+            raise ValueError(f"{base_dir} is a file, not a directory.")
 
         try: # extra protection to better handle concurrent access
-            if not os.path.isdir(dir_name):
-                os.mkdir(dir_name)
+            if not os.path.isdir(base_dir):
+                os.mkdir(base_dir)
         except:
             time.sleep(random.random()/random.randint(1, 3))
-            if not os.path.isdir(dir_name):
-                os.mkdir(dir_name)
-        assert os.path.isdir(dir_name)
+            if not os.path.isdir(base_dir):
+                os.mkdir(base_dir)
+        assert os.path.isdir(base_dir)
 
-        self.base_dir = os.path.abspath(dir_name)
+        self.base_dir = os.path.abspath(base_dir)
 
     def __repr__(self):
         """Return repr(self)."""
 
         repr_str = super().__repr__()
-        repr_str = repr_str[:-1] + f", dir_name={self.base_dir}"
+        repr_str = repr_str[:-1] + f", base_dir={self.base_dir}"
         repr_str += f", file_type={self.file_type}"
         repr_str += " )"
 
@@ -106,7 +109,7 @@ class FileDirDict(PersiDict):
         """Return configuration parameters of the dictionary."""
         params = super().get_params()
         additional_params = dict(
-            dir_name=self.base_dir
+            base_dir=self.base_dir
             , file_type=self.file_type)
         params.update(additional_params)
         return params
@@ -115,7 +118,7 @@ class FileDirDict(PersiDict):
     def get_default_params(cls) -> dict:
         """Return default configuration parameters of the dictionary."""
         params = dict(
-            dir_name="FileDirDict"
+            base_dir="__file_dir_dict__"
             , file_type="pkl"
             , immutable_items=False
             , digest_len=8
@@ -192,7 +195,7 @@ class FileDirDict(PersiDict):
         full_dir_path = self._build_full_path(
             key, create_subdirs = True, is_file_path = False)
         return FileDirDict(
-            dir_name = full_dir_path
+            base_dir= full_dir_path
             , file_type=self.file_type
             , immutable_items= self.immutable_items
             , digest_len=self.digest_len

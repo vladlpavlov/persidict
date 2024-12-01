@@ -18,7 +18,7 @@ Class 'FileDirDict' is a persistent dictionary that stores its content
 in a folder on a disk.
 
     from persidict import FileDirDict    
-    my_dictionary = FileDirDict(dir_name="my_folder")
+    my_dictionary = FileDirDict(base_dir="my_folder")
 
 Once created, it can be used as a regular Python dictionary 
 that stores key-value pairs. A key must be a sequence of strings, 
@@ -63,7 +63,7 @@ Any pickleable Python object can be used as a value.
 Unlike regular Python dictionaries, insertion order is not preserved.
 
     del my_dictionary
-    new_dict = FileDirDict(dir_name="my_folder")
+    new_dict = FileDirDict(base_dir="my_folder")
     print("len(new_dict) == ",len(new_dict))
 
 The code above will create a new object named new_dict and then will

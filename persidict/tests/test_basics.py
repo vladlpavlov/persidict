@@ -13,7 +13,7 @@ from persidict.tests.data_for_mutable_tests import mutable_tests
 @pytest.mark.parametrize("DictToTest, kwargs", mutable_tests)
 @mock_aws
 def test_basics(tmpdir, DictToTest, kwargs):
-    dict_to_test = DictToTest(dir_name=tmpdir, **kwargs)
+    dict_to_test = DictToTest(base_dir=tmpdir, **kwargs)
     dict_to_test.clear()
     model_dict = dict()
     assert len(dict_to_test) == len(model_dict) == 0

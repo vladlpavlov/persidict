@@ -17,7 +17,7 @@ def test_case_sensitivity(tmpdir, DictToTest, kwargs):
     if "digest_len" in kwargs and kwargs["digest_len"] <=3:
         return
 
-    dict_to_test = DictToTest(dir_name = tmpdir, **kwargs)
+    dict_to_test = DictToTest(base_dir = tmpdir, **kwargs)
     dict_to_test.clear()
     model_dict = dict()
 

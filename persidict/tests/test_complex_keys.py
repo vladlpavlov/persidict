@@ -14,7 +14,7 @@ from persidict.tests.data_for_mutable_tests import mutable_tests
 @mock_aws
 def test_complex_keys(tmpdir, DictToTest, kwargs):
     """Test if compound keys work correctly."""
-    dict_to_test = DictToTest(dir_name=tmpdir, **kwargs)
+    dict_to_test = DictToTest(base_dir=tmpdir, **kwargs)
     dict_to_test.clear()
     model_dict = dict()
 
