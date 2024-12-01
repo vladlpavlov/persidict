@@ -22,10 +22,12 @@ import jsonpickle.ext.pandas as jsonpickle_pandas
 from .safe_chars import replace_unsafe_chars
 from .safe_str_tuple import SafeStrTuple
 from .safe_str_tuple_signing import sign_safe_str_tuple, unsign_safe_str_tuple
-from .persi_dict import PersiDict, PersiDictKey
+from .persi_dict import PersiDict, PersiDictKey, CLASSNAME_METAPARAM_KEY
 
 jsonpickle_numpy.register_handlers()
 jsonpickle_pandas.register_handlers()
+
+FILEDIRDICT_DEFAULT_BASE_DIR = "__file_dir_dict__"
 
 class FileDirDict(PersiDict):
     """ A persistent Dict that stores key-value pairs in local files.
@@ -44,7 +46,7 @@ class FileDirDict(PersiDict):
     file_type:str
 
     def __init__(self
-                 , base_dir: str = "__file_dir_dict__"
+                 , base_dir: str = FILEDIRDICT_DEFAULT_BASE_DIR
                  , file_type: str = "pkl"
                  , immutable_items:bool = False
                  , digest_len:int = 8
@@ -93,6 +95,7 @@ class FileDirDict(PersiDict):
                 os.mkdir(base_dir)
         assert os.path.isdir(base_dir)
 
+        self.base_dir_param = base_dir
         self.base_dir = os.path.abspath(base_dir)
 
     def __repr__(self):
@@ -109,7 +112,7 @@ class FileDirDict(PersiDict):
         """Return configuration parameters of the dictionary."""
         params = super().get_metaparams()
         additional_params = dict(
-            base_dir=self.base_dir
+            base_dir=self.base_dir_param
             , file_type=self.file_type)
         params.update(additional_params)
         return params
@@ -118,11 +121,12 @@ class FileDirDict(PersiDict):
     def get_default_metaparams(cls) -> dict:
         """Return default configuration parameters of the dictionary."""
         params = dict(
-            base_dir="__file_dir_dict__"
+            base_dir=FILEDIRDICT_DEFAULT_BASE_DIR
             , file_type="pkl"
             , immutable_items=False
             , digest_len=8
             , base_class_for_values=None)
+        params[CLASSNAME_METAPARAM_KEY] = cls.__name__
         return params
 
 

@@ -22,10 +22,13 @@ from __future__ import annotations
 
 from abc import abstractmethod
 import random
+from copy import deepcopy
 from typing import Any, Sequence, Optional
 from collections.abc import MutableMapping
 
 from .safe_str_tuple import SafeStrTuple
+
+CLASSNAME_METAPARAM_KEY = "__class__.__name__"
 
 PersiDictKey = SafeStrTuple | Sequence[str] | str
 """ A value which can be used as a key for PersiDict. 
@@ -94,22 +97,29 @@ class PersiDict(MutableMapping):
 
     def get_metaparams(self):
         """Return a dictionary of metaparameters for the PersiDict object."""
-        return dict(
-            __class_name__=self.__class__.__name__
-            , immutable_items=self.immutable_items
+        metaparams =  dict(
+            immutable_items=self.immutable_items
             , digest_len=self.digest_len
             , base_class_for_values=self.base_class_for_values
         )
+        metaparams[CLASSNAME_METAPARAM_KEY] = self.__class__.__name__
+        return metaparams
+
+    def get_params(self):
+        """Return a dictionary of parameters for the PersiDict object."""
+        params = self.get_metaparams()
+        del params[CLASSNAME_METAPARAM_KEY]
+        return params
 
     @classmethod
     def get_default_metaparams(cls) -> dict:
         """Return a dictionary of default metaparameters for PersiDict objects."""
-        return dict(
-            __class_name__=cls.__name__
-            , immutable_items=False
+        params = dict(
+            immutable_items=False
             , digest_len=8
-            , base_class_for_values=None
-        )
+            , base_class_for_values=None)
+        params[CLASSNAME_METAPARAM_KEY] = cls.__name__
+        return params
 
 
     def __repr__(self) -> str:

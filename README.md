@@ -126,7 +126,7 @@ that simultaneously work with the same instance of a dictionary.
 * `PersiDict` API has additional methods `delete_if_exists()`, `timestamp()`,
 `get_subdict()`, `subdicts()`, `random_keys()`, `newest_keys()`, 
 `oldest_keys()`, `newest_values()`, `oldest_values()`, 
-`get_metaparams()`, and `get_default_metaparams()`,
+`get_params()`, `get_metaparams()`, and `get_default_metaparams()`,
 which are not available in native Python dicts.
 
 ## Fine Tuning

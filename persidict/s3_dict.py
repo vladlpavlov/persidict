@@ -7,7 +7,7 @@ import boto3
 
 from .safe_str_tuple import SafeStrTuple
 from .safe_str_tuple_signing import sign_safe_str_tuple, unsign_safe_str_tuple
-from .persi_dict import PersiDict
+from .persi_dict import PersiDict, CLASSNAME_METAPARAM_KEY
 from .file_dir_dict import FileDirDict, PersiDictKey
 
 
@@ -104,21 +104,17 @@ class S3Dict(PersiDict):
     def get_metaparams(self):
         """Return configuration parameters of the object as a dictionary."""
         params = self.local_cache.get_metaparams()
-        additional_params = dict(
-            __class_name__ = self.__class__.__name__
-            , region = self.region
-            , bucket_name = self.bucket_name
-            , root_prefix = self.root_prefix
-            )
-        params.update(additional_params)
+        params[CLASSNAME_METAPARAM_KEY] = self.__class__.__name__
+        params["region"] = self.region
+        params["bucket_name"] = self.bucket_name
+        params["root_prefix"] = self.root_prefix
         return params
 
     @classmethod
     def get_default_metaparams(cls) -> dict:
         """Return default configuration parameters of the object as a dictionary."""
         params =  dict(
-            __class_name__ = cls.__name__
-            , region = None
+            region = None
             , bucket_name = "my_bucket"
             , root_prefix = ""
             , base_dir = "__s3_dict__"
@@ -127,6 +123,7 @@ class S3Dict(PersiDict):
             , digest_len = 8
             , base_class_for_values = None
             )
+        params[CLASSNAME_METAPARAM_KEY] = cls.__name__
         return params
 
 
