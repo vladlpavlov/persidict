@@ -26,9 +26,13 @@ class S3Dict(PersiDict):
 
     Unlike in native Python dictionaries, insertion order is not preserved.
     """
+    region: str
+    bucket_name: str
+    root_prefix: str
+    file_type: str
+    dir_name: str
 
-
-    def __init__(self, bucket_name:str
+    def __init__(self, bucket_name:str = "my_bucket"
                  , region:str = None
                  , root_prefix:str = ""
                  , dir_name:str = "S3_Dict"
@@ -96,6 +100,32 @@ class S3Dict(PersiDict):
         repr_str += " )"
 
         return repr_str
+
+    def get_params(self):
+        """Return configuration parameters of the object as a dictionary."""
+        params = self.local_cache.get_params()
+        additional_params = dict(
+            region = self.region
+            , bucket_name = self.bucket_name
+            , root_prefix = self.root_prefix
+            )
+        params.update(additional_params)
+        return params
+
+    @classmethod
+    def get_default_params(cls) -> dict:
+        """Return default configuration parameters of the object as a dictionary."""
+        params =  dict(
+            region = None
+            , bucket_name = "my_bucket"
+            , root_prefix = ""
+            , dir_name = "S3_Dict"
+            , file_type = "pkl"
+            , immutable_items = False
+            , digest_len = 8
+            , base_class_for_values = None
+            )
+        return params
 
 
     def _build_full_objectname(self, key:PersiDictKey) -> str:

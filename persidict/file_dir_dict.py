@@ -40,6 +40,9 @@ class FileDirDict(PersiDict):
     text files (either in jason format or as a plain text).
     """
 
+    dir_name:str
+    file_type:str
+
     def __init__(self
                  , dir_name: str = "FileDirDict"
                  , file_type: str = "pkl"
@@ -98,6 +101,26 @@ class FileDirDict(PersiDict):
         repr_str += " )"
 
         return repr_str
+
+    def get_params(self):
+        """Return configuration parameters of the dictionary."""
+        params = super().get_params()
+        additional_params = dict(
+            dir_name=self.base_dir
+            , file_type=self.file_type)
+        params.update(additional_params)
+        return params
+
+    @classmethod
+    def get_default_params(cls) -> dict:
+        """Return default configuration parameters of the dictionary."""
+        params = dict(
+            dir_name="FileDirDict"
+            , file_type="pkl"
+            , immutable_items=False
+            , digest_len=8
+            , base_class_for_values=None)
+        return params
 
 
     def __len__(self) -> int:
