@@ -127,7 +127,7 @@ that simultaneously work with the same instance of a dictionary.
 `get_subdict()`, `subdicts()`, `random_keys()`, `newest_keys()`, 
 `oldest_keys()`, `newest_values()`, `oldest_values()`, 
 `get_metaparams()`, and `get_default_metaparams()`,
-* which are not available in native Python dicts.
+which are not available in native Python dicts.
 
 ## Fine Tuning
 
