@@ -101,11 +101,12 @@ class S3Dict(PersiDict):
 
         return repr_str
 
-    def get_params(self):
+    def get_metaparams(self):
         """Return configuration parameters of the object as a dictionary."""
-        params = self.local_cache.get_params()
+        params = self.local_cache.get_metaparams()
         additional_params = dict(
-            region = self.region
+            __class_name__ = self.__class__.__name__
+            , region = self.region
             , bucket_name = self.bucket_name
             , root_prefix = self.root_prefix
             )
@@ -113,10 +114,11 @@ class S3Dict(PersiDict):
         return params
 
     @classmethod
-    def get_default_params(cls) -> dict:
+    def get_default_metaparams(cls) -> dict:
         """Return default configuration parameters of the object as a dictionary."""
         params =  dict(
-            region = None
+            __class_name__ = cls.__name__
+            , region = None
             , bucket_name = "my_bucket"
             , root_prefix = ""
             , base_dir = "__s3_dict__"

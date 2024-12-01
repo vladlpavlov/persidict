@@ -105,9 +105,9 @@ class FileDirDict(PersiDict):
 
         return repr_str
 
-    def get_params(self):
+    def get_metaparams(self):
         """Return configuration parameters of the dictionary."""
-        params = super().get_params()
+        params = super().get_metaparams()
         additional_params = dict(
             base_dir=self.base_dir
             , file_type=self.file_type)
@@ -115,7 +115,7 @@ class FileDirDict(PersiDict):
         return params
 
     @classmethod
-    def get_default_params(cls) -> dict:
+    def get_default_metaparams(cls) -> dict:
         """Return default configuration parameters of the dictionary."""
         params = dict(
             base_dir="__file_dir_dict__"

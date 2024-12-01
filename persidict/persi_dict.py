@@ -92,21 +92,23 @@ class PersiDict(MutableMapping):
         self.immutable_items = bool(immutable_items)
         self.base_class_for_values = base_class_for_values
 
-    def get_params(self):
-        """Return a dictionary of parameters for the PersiDict object."""
+    def get_metaparams(self):
+        """Return a dictionary of metaparameters for the PersiDict object."""
         return dict(
-            immutable_items=self.immutable_items
-            ,digest_len=self.digest_len
-            ,base_class_for_values=self.base_class_for_values
+            __class_name__=self.__class__.__name__
+            , immutable_items=self.immutable_items
+            , digest_len=self.digest_len
+            , base_class_for_values=self.base_class_for_values
         )
 
     @classmethod
-    def get_default_params(cls) -> dict:
-        """Return a dictionary of default parameters for the PersiDict object."""
+    def get_default_metaparams(cls) -> dict:
+        """Return a dictionary of default metaparameters for PersiDict objects."""
         return dict(
-            immutable_items=False
-            ,digest_len=8
-            ,base_class_for_values=None
+            __class_name__=cls.__name__
+            , immutable_items=False
+            , digest_len=8
+            , base_class_for_values=None
         )
 
 
