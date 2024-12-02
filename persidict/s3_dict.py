@@ -10,6 +10,7 @@ from .safe_str_tuple_signing import sign_safe_str_tuple, unsign_safe_str_tuple
 from .persi_dict import PersiDict, CLASSNAME_METAPARAM_KEY
 from .file_dir_dict import FileDirDict, PersiDictKey
 
+S3DICT_DEFAULT_BASE_DIR = "__s3_dict__"
 
 class S3Dict(PersiDict):
     """ A persistent dictionary that stores key-value pairs as S3 objects.
@@ -35,7 +36,7 @@ class S3Dict(PersiDict):
     def __init__(self, bucket_name:str = "my_bucket"
                  , region:str = None
                  , root_prefix:str = ""
-                 , base_dir:str = "__s3_dict__"
+                 , base_dir:str = S3DICT_DEFAULT_BASE_DIR
                  , file_type:str = "pkl"
                  , immutable_items:bool = False
                  , digest_len:int = 8
@@ -117,7 +118,7 @@ class S3Dict(PersiDict):
             region = None
             , bucket_name = "my_bucket"
             , root_prefix = ""
-            , base_dir = "__s3_dict__"
+            , base_dir = S3DICT_DEFAULT_BASE_DIR
             , file_type = "pkl"
             , immutable_items = False
             , digest_len = 8
