@@ -4,10 +4,11 @@ import os
 from typing import Any, Optional
 
 import boto3
+import parameterizable
 
 from .safe_str_tuple import SafeStrTuple
 from .safe_str_tuple_signing import sign_safe_str_tuple, unsign_safe_str_tuple
-from .persi_dict import PersiDict, CLASSNAME_METAPARAM_KEY
+from .persi_dict import PersiDict
 from .file_dir_dict import FileDirDict, PersiDictKey
 
 S3DICT_DEFAULT_BASE_DIR = "__s3_dict__"
@@ -102,29 +103,12 @@ class S3Dict(PersiDict):
 
         return repr_str
 
-    def get_metaparams(self):
+    def get_params(self):
         """Return configuration parameters of the object as a dictionary."""
-        params = self.local_cache.get_metaparams()
-        params[CLASSNAME_METAPARAM_KEY] = self.__class__.__name__
+        params = self.local_cache.get_params()
         params["region"] = self.region
         params["bucket_name"] = self.bucket_name
         params["root_prefix"] = self.root_prefix
-        return params
-
-    @classmethod
-    def get_default_metaparams(cls) -> dict:
-        """Return default configuration parameters of the object as a dictionary."""
-        params =  dict(
-            region = None
-            , bucket_name = "my_bucket"
-            , root_prefix = ""
-            , base_dir = S3DICT_DEFAULT_BASE_DIR
-            , file_type = "pkl"
-            , immutable_items = False
-            , digest_len = 8
-            , base_class_for_values = None
-            )
-        params[CLASSNAME_METAPARAM_KEY] = cls.__name__
         return params
 
 
@@ -324,3 +308,6 @@ class S3Dict(PersiDict):
         obj_name = self._build_full_objectname(key)
         response = self.s3_client.head_object(Bucket=self.bucket_name, Key=obj_name)
         return response["LastModified"].timestamp()
+
+
+parameterizable.register_parameterizable_class(S3Dict)

@@ -22,13 +22,12 @@ from __future__ import annotations
 
 from abc import abstractmethod
 import random
+from parameterizable import ParameterizableClass
 from copy import deepcopy
 from typing import Any, Sequence, Optional
 from collections.abc import MutableMapping
 
 from .safe_str_tuple import SafeStrTuple
-
-CLASSNAME_METAPARAM_KEY = "__class__.__name__"
 
 PersiDictKey = SafeStrTuple | Sequence[str] | str
 """ A value which can be used as a key for PersiDict. 
@@ -40,7 +39,7 @@ If a string (or a sequence of strings) is passed to a PersiDict as a key,
 it will be automatically converted into SafeStrTuple.
 """
 
-class PersiDict(MutableMapping):
+class PersiDict(MutableMapping, ParameterizableClass):
     """Dict-like durable store that accepts sequences of strings as keys.
 
     An abstract base class for key-value stores. It accepts keys in a form of
@@ -85,7 +84,7 @@ class PersiDict(MutableMapping):
     base_class_for_values:Optional[type]
 
     def __init__(self
-                 , immutable_items:bool
+                 , immutable_items:bool = False
                  , digest_len:int = 8
                  , base_class_for_values:Optional[type] = None
                  , *args, **kwargas):
@@ -95,30 +94,13 @@ class PersiDict(MutableMapping):
         self.immutable_items = bool(immutable_items)
         self.base_class_for_values = base_class_for_values
 
-    def get_metaparams(self):
-        """Return a dictionary of metaparameters for the PersiDict object."""
-        metaparams =  dict(
+    def get_params(self):
+        """Return a dictionary of parameters for the PersiDict object."""
+        params =  dict(
             immutable_items=self.immutable_items
             , digest_len=self.digest_len
             , base_class_for_values=self.base_class_for_values
         )
-        metaparams[CLASSNAME_METAPARAM_KEY] = self.__class__.__name__
-        return metaparams
-
-    def get_params(self):
-        """Return a dictionary of parameters for the PersiDict object."""
-        params = self.get_metaparams()
-        del params[CLASSNAME_METAPARAM_KEY]
-        return params
-
-    @classmethod
-    def get_default_metaparams(cls) -> dict:
-        """Return a dictionary of default metaparameters for PersiDict objects."""
-        params = dict(
-            immutable_items=False
-            , digest_len=8
-            , base_class_for_values=None)
-        params[CLASSNAME_METAPARAM_KEY] = cls.__name__
         return params
 
 

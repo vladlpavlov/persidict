@@ -18,11 +18,13 @@ import joblib
 import jsonpickle
 import jsonpickle.ext.numpy as jsonpickle_numpy
 import jsonpickle.ext.pandas as jsonpickle_pandas
+import parameterizable
 
 from .safe_chars import replace_unsafe_chars
 from .safe_str_tuple import SafeStrTuple
 from .safe_str_tuple_signing import sign_safe_str_tuple, unsign_safe_str_tuple
-from .persi_dict import PersiDict, PersiDictKey, CLASSNAME_METAPARAM_KEY
+from .persi_dict import PersiDict, PersiDictKey
+
 
 jsonpickle_numpy.register_handlers()
 jsonpickle_pandas.register_handlers()
@@ -108,25 +110,13 @@ class FileDirDict(PersiDict):
 
         return repr_str
 
-    def get_metaparams(self):
+    def get_params(self):
         """Return configuration parameters of the dictionary."""
-        params = super().get_metaparams()
+        params = super().get_params()
         additional_params = dict(
             base_dir=self.base_dir_param
             , file_type=self.file_type)
         params.update(additional_params)
-        return params
-
-    @classmethod
-    def get_default_metaparams(cls) -> dict:
-        """Return default configuration parameters of the dictionary."""
-        params = dict(
-            base_dir=FILEDIRDICT_DEFAULT_BASE_DIR
-            , file_type="pkl"
-            , immutable_items=False
-            , digest_len=8
-            , base_class_for_values=None)
-        params[CLASSNAME_METAPARAM_KEY] = cls.__name__
         return params
 
 
@@ -141,6 +131,7 @@ class FileDirDict(PersiDict):
                      if f_name.endswith(suffix)]
             num_files += len(files)
         return num_files
+
 
     def clear(self) -> None:
         """ Remove all elements from the dictionary."""
@@ -368,3 +359,6 @@ class FileDirDict(PersiDict):
         key = SafeStrTuple(key)
         filename = self._build_full_path(key)
         return os.path.getmtime(filename)
+
+
+parameterizable.register_parameterizable_class(FileDirDict)

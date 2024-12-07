@@ -14,7 +14,7 @@ Unlike other persistent dictionaries (e.g. Python's native `shelve`),
 where multiple instances of a program run concurrently across many machines.
 
 ## Usage
-Class 'FileDirDict' is a persistent dictionary that stores its content 
+Class `FileDirDict` is a persistent dictionary that stores its content 
 in a folder on a disk.
 
     from persidict import FileDirDict    
