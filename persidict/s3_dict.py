@@ -82,7 +82,11 @@ class S3Dict(PersiDict):
         else:
             self.s3_client = boto3.client('s3', region_name=region)
 
-        self.bucket = self.s3_client.create_bucket(Bucket=bucket_name)
+        try:
+            self.bucket = self.s3_client.create_bucket(Bucket=bucket_name)
+        except:
+            pass
+
         self.bucket_name = bucket_name
 
         self.root_prefix=root_prefix
